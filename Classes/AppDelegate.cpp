@@ -4,9 +4,16 @@
 #include "AppDelegate.h"
 #include "GameScene.hpp"
 #include "TutorialScene.hpp"
-#include "VideoScene.hpp"
+
 #include "InvestmentLayer.hpp"
 #include "CashManager.hpp"
+#include "VideoScene.hpp"
+#include "BucketScene.hpp"
+
+#include "PluginChartboost/PluginChartboost.h"
+#include "PluginIAP/PluginIAP.h"
+
+using namespace sdkbox;
 
 USING_NS_CC;
 
@@ -55,7 +62,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     }
 
     // turn on display FPS
-    director->setDisplayStats(true);
+    director->setDisplayStats(false);
 
     // set FPS. the default value is 1.0/60 if you don't call this
     director->setAnimationInterval(1.0 / 60);
@@ -78,8 +85,12 @@ bool AppDelegate::applicationDidFinishLaunching() {
 //    {        
 //        director->setContentScaleFactor(MIN(smallResolutionSize.height/designResolutionSize.height, smallResolutionSize.width/designResolutionSize.width));
 //    }
-
+        
     register_all_packages();
+    
+// SDKBOX init
+    PluginChartboost::init();
+    IAP::init();
     
     FileUtils *sharedFileUtils = FileUtils::getInstance();
     std::vector<std::string> searchPaths;
@@ -90,12 +101,20 @@ bool AppDelegate::applicationDidFinishLaunching() {
     searchPaths.push_back("engineimages/invest");
     searchPaths.push_back("engineimages/business");
     searchPaths.push_back("engineimages/political");
+    searchPaths.push_back("engineimages/inapppurchas");
+    searchPaths.push_back("engineimages/popcornshop");
+    searchPaths.push_back("engineimages/popcorns");
+    searchPaths.push_back("engineimages/bigpopcorn");
+    searchPaths.push_back("tutorial");
     searchPaths.push_back("sounds");
     searchPaths.push_back("fonts");
     sharedFileUtils->setSearchPaths(searchPaths);
     
     initAppInfo();
-
+// Test
+//    CashManager *cashmanager = CashManager::getInstance();
+//    cashmanager->setCurrentCash(1000000000000000);
+    
     // create a scene. it's an autorelease object
     
     Scene *scene;
@@ -105,7 +124,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     }else
     {
         scene = GameScene::createScene();
-//        scene = InvestmentLayer::createScene();
+//        scene = BucketScene::createScene();
     }
     
     // run
@@ -140,7 +159,7 @@ void AppDelegate::initAppInfo()
         userdefault->setIntegerForKey("unholy_count", 0);
         userdefault->setIntegerForKey("honey_count", 0);
         
-        userdefault->setFloatForKey("piggybank_price",      80*1.7);
+        userdefault->setFloatForKey("piggybank_price",      80*1.2);
         userdefault->setFloatForKey("mattress_price",       400*1.7);
         userdefault->setFloatForKey("comicbook_price",      1600*1.7);
         userdefault->setFloatForKey("savingaccount_price",  8000*1.7);
@@ -182,7 +201,7 @@ void AppDelegate::initAppInfo()
         userdefault->setIntegerForKey("banana_count", 0);
         
 ////////
-        userdefault->setFloatForKey("paperroute_price", 240);
+        userdefault->setFloatForKey("paperroute_price", 50);
         userdefault->setFloatForKey("lemon_price",      2187.5);
         userdefault->setFloatForKey("flower_price",     15000);
         userdefault->setFloatForKey("coffee_price",     105000);
@@ -220,16 +239,16 @@ void AppDelegate::initAppInfo()
         userdefault->setIntegerForKey("14_count", 0);
         userdefault->setIntegerForKey("15_count", 0);
         
-        userdefault->setFloatForKey("0_price", 200);
-        userdefault->setFloatForKey("1_price", 1000);
-        userdefault->setFloatForKey("2_price", 3000);
-        userdefault->setFloatForKey("3_price", 9800);
-        userdefault->setFloatForKey("4_price", 15000);
-        userdefault->setFloatForKey("5_price", 60000);
-        userdefault->setFloatForKey("6_price", 700000);
-        userdefault->setFloatForKey("7_price", 8900000);
-        userdefault->setFloatForKey("8_price", 45000000);
-        userdefault->setFloatForKey("9_price", 700000000);
+        userdefault->setFloatForKey("0_price",  200);
+        userdefault->setFloatForKey("1_price",  1000);
+        userdefault->setFloatForKey("2_price",  3000);
+        userdefault->setFloatForKey("3_price",  9800);
+        userdefault->setFloatForKey("4_price",  15000);
+        userdefault->setFloatForKey("5_price",  60000);
+        userdefault->setFloatForKey("6_price",  700000);
+        userdefault->setFloatForKey("7_price",  8900000);
+        userdefault->setFloatForKey("8_price",  45000000);
+        userdefault->setFloatForKey("9_price",  700000000);
         userdefault->setFloatForKey("10_price", 10000000000);
         userdefault->setFloatForKey("11_price", 777000000000);
         userdefault->setFloatForKey("12_price", 105000000000000);
@@ -280,7 +299,7 @@ void AppDelegate::initAppInfo()
         userdefault->setBoolForKey("Treadmill", false);
         userdefault->setBoolForKey("TreadmillPurchased", false);
         userdefault->setBoolForKey("RibbonShown", false);
-        userdefault->setBoolForKey("tutorial", true);
+        userdefault->setBoolForKey("tutorial", false);
         
         userdefault->setFloatForKey("chefhat_price",    50000);
         userdefault->setFloatForKey("Upiggybank_price", 10000000);
@@ -366,6 +385,27 @@ void AppDelegate::initAppInfo()
         userdefault->setFloatForKey("desert_price",     6);
         userdefault->setFloatForKey("beach_price",      7);
     }
+    
+    CashManager *cashmanager = CashManager::getInstance();
+    cashmanager->setCurrentCash(userdefault->getFloatForKey("currentcash"));
+    cashmanager->setCurrentShaker(userdefault->getFloatForKey("currentshakers"));
+    cashmanager->reloadCashPerSecondAndCashPerSwap();
+    
+    if (cashmanager->getCashPerHour() != 0) {
+        time_t cur_seconds;
+        cur_seconds = time (NULL);
+        int old_second = userdefault->getIntegerForKey("currentdate");
+        int sec = (int)cur_seconds - old_second;
+        
+        if (sec < 0) {
+            sec = -sec;
+        }
+        
+        cashmanager->setCurrentBucket(userdefault->getFloatForKey("currentbucket") + cashmanager->getCashPerHour() * sec / 3600);
+        if (cashmanager->getCurrentBucket() > cashmanager->getBucketSize()) {
+            cashmanager->setCurrentBucket(cashmanager->getBucketSize());
+        }
+    }
 }
 
 void AppDelegate::saveBucket()
@@ -374,30 +414,12 @@ void AppDelegate::saveBucket()
     UserDefault::getInstance()->setFloatForKey("currentbucket", cashmanager->getCurrentBucket());
     float bucketRemaining = cashmanager->getBucketSize() - cashmanager->getCurrentBucket();
     float secTofull = bucketRemaining / (cashmanager->getCashPerHour()  / 3600);
-    
     time_t seconds;
     
     seconds = time (NULL);
     printf ("%d seconds since January 1, 1970", (int)seconds);
     UserDefault::getInstance()->setIntegerForKey("currentdate", (int)seconds);
 
-    
-//    NSDate *date=[NSDate date];
-//    [[NSUserDefaults standardUserDefaults] setObject:date forKey:@"currentdate"];
-//    NSDate *fireDate=[NSDate dateWithTimeIntervalSinceNow:secTofull];
-//    
-//    UILocalNotification *localNotification = [[UILocalNotification alloc] init];
-//    localNotification.fireDate = fireDate;
-//    localNotification.repeatInterval = NSWeekdayCalendarUnit;
-//    localNotification.timeZone = [NSTimeZone systemTimeZone];
-//    
-//    localNotification.alertBody = @"Your bucket is full!";
-//    localNotification.alertAction = @"You're wasting Kernels! Don't forget to empty your bucket.";
-//    localNotification.soundName = UILocalNotificationDefaultSoundName;
-//    
-//    // Schedule it with the app
-//    [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
-//    [localNotification release];
 }
 
 // This function will be called when the app is inactive. When comes a phone call,it's be invoked too
@@ -406,7 +428,7 @@ void AppDelegate::applicationDidEnterBackground() {
 
     // if you use SimpleAudioEngine, it must be pause
     // SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
-    
+    CashManager::getInstance()->saveCurrentCash();
     saveBucket();
 }
 
@@ -446,6 +468,117 @@ void AppDelegate::applicationWillEnterForeground() {
         if (cashmanager->getCurrentBucket() > cashmanager->getBucketSize()) {
             cashmanager->setCurrentBucket(cashmanager->getBucketSize());
         }
+    }
+    
+    // DidBecomeActive
+    
+    
+    if (userdefault->getBoolForKey("reviewPopup") == 0) {
+        vector<string> list_countkey;
+        // Invest
+        list_countkey.push_back("piggybank_count");
+        list_countkey.push_back("mattress_count");
+        list_countkey.push_back("comicbook_count");
+        list_countkey.push_back("savingaccount_count");
+        list_countkey.push_back("bitcoinaccount_count");
+        list_countkey.push_back("stockes_count");
+        list_countkey.push_back("bookie_count");
+        list_countkey.push_back("loanshark_count");
+        list_countkey.push_back("angelinvestment_count");
+        list_countkey.push_back("vanturecapital_count");
+        list_countkey.push_back("porkbelly_count");
+        list_countkey.push_back("hedgefund_count");
+        list_countkey.push_back("investmentbank_count");
+        list_countkey.push_back("insidertrading_count");
+        list_countkey.push_back("mortgage_count");
+        list_countkey.push_back("pyramid_count");
+        list_countkey.push_back("hypercube_count");
+        list_countkey.push_back("unholy_count");
+        list_countkey.push_back("honey_count");
+        
+        // Business
+        list_countkey.push_back("paperroute_count");
+        list_countkey.push_back("lemon_count");
+        list_countkey.push_back("flower_count");
+        list_countkey.push_back("coffee_count");
+        list_countkey.push_back("fastfood_count");
+        list_countkey.push_back("casino_count");
+        list_countkey.push_back("cigrate_count");
+        list_countkey.push_back("soda_count");
+        list_countkey.push_back("railroad_count");
+        list_countkey.push_back("strip_count");
+        list_countkey.push_back("arctic_count");
+        list_countkey.push_back("candytheft_price");
+        list_countkey.push_back("oldlady_count");
+        list_countkey.push_back("clown_count");
+        list_countkey.push_back("nsa_count");
+        list_countkey.push_back("dog_count");
+        list_countkey.push_back("cat_count");
+        list_countkey.push_back("cryogenic_count");
+        list_countkey.push_back("banana_count");
+        
+        // Political
+        list_countkey.push_back("0_count");
+        list_countkey.push_back("1_count");
+        list_countkey.push_back("2_count");
+        list_countkey.push_back("3_count");
+        list_countkey.push_back("4_count");
+        list_countkey.push_back("5_count");
+        list_countkey.push_back("6_count");
+        list_countkey.push_back("7_count");
+        list_countkey.push_back("8_count");
+        list_countkey.push_back("9_count");
+        list_countkey.push_back("10_count");
+        list_countkey.push_back("11_count");
+        list_countkey.push_back("12_count");
+        list_countkey.push_back("13_count");
+        list_countkey.push_back("14_count");
+        list_countkey.push_back("15_count");
+        
+        list_countkey.push_back("prestige_count");
+        
+        for (int index = 0; index < list_countkey.size(); index++) {
+            if (userdefault->getIntegerForKey(list_countkey[index].c_str(), 0) == 0) {
+                float shaker = cashmanager->getCurrentShaker();
+                cashmanager->setCurrentShaker(shaker + 1);
+            }
+        }
+        
+        list_countkey.clear();
+        // Unlockables
+        list_countkey.push_back("chefhat_price");
+        list_countkey.push_back("Upiggybank_price");
+        list_countkey.push_back("moon_price");
+        list_countkey.push_back("earth_price");
+        list_countkey.push_back("spaceship_price");
+        list_countkey.push_back("ufo_price");
+        list_countkey.push_back("dinnerplate_price");
+        list_countkey.push_back("trophycup_price");
+        list_countkey.push_back("car_price");
+        list_countkey.push_back("umbrella_price");
+        list_countkey.push_back("diamond_price");
+        list_countkey.push_back("prestige_price");
+        list_countkey.push_back("ocean_price");
+        list_countkey.push_back("city_price");
+        list_countkey.push_back("sky_price");
+        list_countkey.push_back("universe_price");
+        list_countkey.push_back("jungle_price");
+        list_countkey.push_back("desert_price");
+        list_countkey.push_back("beach_price");
+        
+        for (int index = 0; index < list_countkey.size(); index++) {
+            if (userdefault->getFloatForKey(list_countkey[index].c_str(), 0) == 0) {
+                float shaker = cashmanager->getCurrentShaker();
+                cashmanager->setCurrentShaker(shaker + 1);
+            }
+        }
+        
+        if (userdefault->getBoolForKey("Forever20") || userdefault->getBoolForKey("RemoveAds")) {
+            float shaker = cashmanager->getCurrentShaker();
+            cashmanager->setCurrentShaker(shaker + 1);
+        }
+        
+        userdefault->setIntegerForKey("reviewPopup", 1);
     }
     
 }

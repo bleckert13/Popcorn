@@ -21,17 +21,18 @@ class GameScene : public Layer
 public:
     virtual bool init();
     static Scene* createScene();
-    CREATE_FUNC(GameScene);
+    void setButtonEnable(bool value);
+    CREATE_FUNC(GameScene);    
 private:
     Sprite *BG;
-    Sprite *bgSprite;
+    Sprite *m_spt_Bucket;
     Sprite *currentSkewed;
     Sprite *digitSprite;
     Sprite *perSecondRibbon;
     Sprite *bottomClickbar;
     Sprite *topClickbar;
-    Sprite *m_BigPopcorn;
-    Sprite *GoldenKernel;
+    Sprite *m_spt_BigPopcorn;
+    Sprite *m_spt_GoldenKernel;
     
     Sprite *mBG1;
     Sprite *mBG2;
@@ -47,9 +48,9 @@ private:
     
     Sprite *skewd;
     
-    Sprite *PrestigeRibbon;
-    Sprite *coverSprite;
-    Sprite *ForeverTwenty;
+    Sprite *m_spt_PrestigeRibbon;
+    Sprite *m_spt_Cover;
+    Sprite *m_spt_ForeverTwenty;
     MoveTo *moveL;
     MoveTo *moveR;
     MenuItemImage *bucketButton;
@@ -57,39 +58,40 @@ private:
     MenuItemImage *reviewbutton;
     MenuItemImage *gamecenterButton;
 //    MenuItemImage *popcornButton;
+    Menu *m_btnmenu;
     
     Vector<Sprite*> skewdArray;
     
-    Label *MoneyPerSwapLabel;
+    Label *m_lbl_MoneyPerSwap;
     
-    Label *MoneyPerSecondLabel;
+    Label *m_lbl_MoneyPerSecond;
     
-    Label *scoreLabel;
+    Label *m_lbl_Score;
     
-    Label *prestigeLabel;
+    Label *m_lbl_Prestige;
     // UILabel *Score_Label;
     
-    Label *MultiplierLabel;
-    Label *ClickMultiplierLabel;
-    Label *BonusLabel;
+    Label *m_lbl_MultiplierLabel;
+    Label *m_lbl_ClickMultiplierLabel;
+    Label *m_lbl_Bonus;
     
-    Label *TutorialLabel;
+    Label *m_lbl_Tutorial;
     
     
     Point startPoint;
     Point endPoint;
-    int Review;
+    int review;
     int adCount;
     int swapsCount;
     int barwidth;
     bool popping;
-    bool Lmoving;
-    int BonusNumber;
-    int RandomMultiplier;
-    int ClickMultiplier;
+    bool m_bool_Lmoving;
+    int m_int_BonusNumber;
+    int m_int_RandomMultiplier;
+    int m_int_ClickMultiplier;
     int videoClicks;
-    int VideoBonusNumb;;
-    int LoadedVideo;
+    int m_int_VideoBonusNumb;;
+    int m_int_LoadedVideo;
     bool twox;
     bool threex;
     bool fivex;
@@ -119,42 +121,39 @@ private:
     int  doublethirtytime;
     bool twentyten;
     int  twentytentime;
-    int     RDMShaker;
-    bool    idleshown;
-    bool    messageshown;
+    int  m_int_RDMShaker;
+    bool idleshown;
+    bool messageshown;
     
-//    NSMutableArray *NumbersArray;
-//    
-//    NSMutableArray *NumbersArraylower;
-    
-    UserDefault *userdefault;
+    UserDefault *m_userdefault;
     
     void tick(float dt);
     void scroll(float dt);
     void topMove();
     void move();
-    void CheckPrestige();
-    void CheckPlayedVideo(float dt);
-    void CheckReward(float dt);
-    void CheckVideo(float dt);
-    void BigPopcorn();
-    void CheckUnlockables();
-    void RollDollar(float dt);
-    void PersecondLabel(float dt);
-    void AddPerSecond(float dt);
-    void ShowBucket();
-    void AddCashPerSwap();
-    void AddSkwedSprite();
-    void AddBonus();
-    void RemoveMultiplier();
-    void Multiplier();
-    void MultiplyValue();
-    void AnimateSkewdSprite();
-    void Background(float dt);
-    void Unlockables(float dt);
-    void AddVideoBonus();
-    void BonusAnimation();
+    void checkPrestige();
+    void checkPlayedVideo(float dt);
+    void checkReward(float dt);
+    void checkVideo(float dt);
+    void bigPopcorn();
+    void checkUnlockables();
+    void rollDollar(float dt);
+    void persecondLabel(float dt);
+    void addPerSecond(float dt);
+    void showBucket();
+    void addCashPerSwap();
+    void addSkwedSprite();
+    void addBonus();
+    void removeMultiplier();
+    void multiplier();
+    void multiplyValue();
+    void animateSkewdSprite();
+    void setBackground(float dt);
+    void unlockables(float dt);
+    void addVideoBonus();
+    void bonusAnimation();
     void panForTranslation(Point translation);
+    
     
     virtual void onTouchesBegan(const std::vector<Touch*>& touches, Event *pEvent);
     virtual void onTouchesMoved(const std::vector<Touch*>& touches, Event *pEvent);

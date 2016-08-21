@@ -9,6 +9,7 @@
 #include "ReviewScene.hpp"
 #include "Constants.h"
 #include "CashManager.hpp"
+#include "GameScene.hpp"
 
 Scene* ReviewScene::createScene()
 {
@@ -31,10 +32,10 @@ bool ReviewScene::init()
         return false;
     }
     
-    Sprite *bgSprite = Sprite::create("bucktbg.png");
-    bgSprite->setPosition(G_SWIDTH / 2, G_SHEIGHT / 2);
-    bgSprite->setScale(G_SWIDTH / 1024 , G_SHEIGHT / 1024);
-    this->addChild(bgSprite);
+    Sprite *spt_bgBucket = Sprite::create("bucktbg.png");
+    spt_bgBucket->setPosition(G_SWIDTH / 2, G_SHEIGHT / 2);
+    spt_bgBucket->setScale(G_SWIDTH / 1024 , G_SHEIGHT / 1024);
+    this->addChild(spt_bgBucket);
     
     Sprite *bg_title = Sprite::create("PerSecondLabel.png");
     bg_title->setScale(G_SCALEM * 0.9);
@@ -89,7 +90,15 @@ bool ReviewScene::init()
                                                      "cross.png",
                                                      [&](Ref *sender)
                                                      {
-                                                         log("Close Button Clicked");
+                                                         log("Review -- Close Button Clicked");
+                                                         Director::getInstance()->getEventDispatcher()->resumeEventListenersForTarget(this->getParent());
+                                                         
+                                                         if (dynamic_cast<GameScene*>(this->getParent())) {
+                                                             GameScene* gamescene = (GameScene*)this->getParent();
+                                                             gamescene->setButtonEnable(true);
+                                                         }
+                                                         
+                                                         this->removeFromParent();
                                                      });
     btn_close->setPosition(G_SWIDTH * 0.9, G_SHEIGHT * 0.95);
     btn_close->setScale(G_SCALEM * 1.5);

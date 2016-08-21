@@ -27,61 +27,58 @@ Scene* TutorialScene::createScene()
 
 bool TutorialScene::init()
 {
-    if (!LayerColor::initWithColor(ccc4(255, 255, 255, 255))) {
+    if (!LayerColor::initWithColor(Color4B(255, 255, 255, 255))) {
         return false;
     }
     
-    Label *title = Label::createWithTTF(T_TUTOR_TITLE, "AmericanTypewriter.ttf", G_SWIDTH / 12);
-    title->setPosition(G_SWIDTH / 2, G_SHEIGHT * 4 / 5);
-    title->setColor(Color3B::BLACK);
-    this->addChild(title);
+    m_tutorIndex = 0;
     
-    Label *desc = Label::createWithTTF(T_TUTOR_DES, "AmericanTypewriter.ttf", G_SWIDTH / 20);
-    desc->setPosition(G_SWIDTH / 2, title->getPositionY() - 100 * G_SCALEM);
-    desc->setAnchorPoint(Vec2(0.5, 1));
-    desc->setWidth(G_SWIDTH * 0.9);
-    desc->setColor(Color3B::BLACK);
-    this->addChild(desc);
-
-    Sprite *shaker = Sprite::create("shaker.png");
-    shaker->setScale(G_SCALEM * 0.12);
-    shaker->setAnchorPoint(Vec2(0.0f, 0.5f));
-    shaker->setPosition(G_SWIDTH * 0.1, desc->getPositionY() - desc->getBoundingBox().size.height - shaker->getBoundingBox().size.height / 2 - 20 * G_SCALEM);
-    this->addChild(shaker);
-
-    Label *item_desc1 = Label::createWithTTF(T_TUTOR_ITEM1, "AmericanTypewriter.ttf", G_SWIDTH / 25);
-    item_desc1->setWidth(G_SWIDTH * 0.6);
-    item_desc1->setAnchorPoint(Vec2(0.0f, 0.5f));
-    item_desc1->setPosition(shaker->getPositionX() + shaker->getBoundingBox().size.width + 40 * G_SCALEM, shaker->getPositionY());
-    item_desc1->setColor(Color3B::BLACK);
-    this->addChild(item_desc1);
-
-    Sprite *presteige = Sprite::create("presteige.png");
-    presteige->setScale(G_SCALEM * 0.2);
-    presteige->setAnchorPoint(Vec2(0.0f, 0.5f));
-    presteige->setPosition(G_SWIDTH * 0.1, item_desc1->getPositionY() - item_desc1->getBoundingBox().size.height - 20 * G_SCALEM);
-    this->addChild(presteige);
+    m_spt_tutorial = Sprite::create(StringUtils::format("tutorialpic%d.png", m_tutorIndex));    
+    m_spt_tutorial->setScale(G_SWIDTH / 750, G_SHEIGHT / 1334);
+    m_spt_tutorial->setAnchorPoint(Vec2::ZERO);
+    m_spt_tutorial->setPosition(Vec2::ZERO);
+    this->addChild(m_spt_tutorial);
     
-    Label *item_desc2 = Label::createWithTTF(T_TUTOR_ITEM2, "AmericanTypewriter.ttf", G_SWIDTH / 25);
-    item_desc2->setWidth(G_SWIDTH * 0.6);
-    item_desc2->setAnchorPoint(Vec2(0.0f, 0.5f));
-    item_desc2->setPosition(item_desc1->getPositionX(), presteige->getPositionY());
-    item_desc2->setColor(Color3B::BLACK);
-    this->addChild(item_desc2);
+    m_btn_next = MenuItemImage::create("btn_start.png",
+                                       "btn_start.png",
+                                       CC_CALLBACK_1(TutorialScene::onNextButton, this)
+                                       );
+    m_btn_next->setPosition(G_SWIDTH * 0.75, 100 * G_SCALEY);
+    m_btn_next->setScale(G_SCALEM);
     
-    MenuItemImage* btn_close = MenuItemImage::create("cross.png",
-                                                     "cross.png",
-                                                     [&](Ref *sender)
-                                                     {
-                                                         UserDefault::getInstance()->setBoolForKey("tutorial", true);
-                                                         Director::getInstance()->replaceScene(TransitionCrossFade::create(0.5f, GameScene::createScene()));
-                                                     });
-    btn_close->setPosition(G_SWIDTH * 0.9, G_SHEIGHT * 0.9);
-    btn_close->setScale(G_SCALEM * 1.5);
-    
-    Menu *menu = Menu::create(btn_close, NULL);
+    Menu *menu = Menu::create(m_btn_next, NULL);
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu);
     
     return true;
+}
+
+void TutorialScene::onNextButton(cocos2d::Ref *sender)
+{
+    m_tutorIndex++;
+    if (m_tutorIndex < 13){
+        m_spt_tutorial->setTexture(StringUtils::format("tutorialpic%d.png", m_tutorIndex));
+    }    
+    if (m_tutorIndex == 1) {
+        m_btn_next->setNormalImage(Sprite::create("btn_next.png"));
+        m_btn_next->setSelectedImage(Sprite::create("btn_next.png"));
+    }else if (m_tutorIndex == 12)
+    {
+        m_btn_next->setNormalImage(Sprite::create("btn_play.png"));
+        m_btn_next->setSelectedImage(Sprite::create("btn_play.png"));
+    }
+    
+    switch (m_tutorIndex) {
+        case 3:
+            m_btn_next->setPosition(G_SWIDTH * 0.75, 40 * G_SCALEY);
+            break;
+        default:
+            m_btn_next->setPosition(G_SWIDTH * 0.75, 150 * G_SCALEY);
+            break;
+    }
+    
+    if (m_tutorIndex == 13) {
+        UserDefault::getInstance()->setBoolForKey("tutorial", true);
+        Director::getInstance()->replaceScene(GameScene::createScene());
+    }
 }

@@ -24,6 +24,7 @@ public:
     CREATE_FUNC(VideoScene);
 private:
     void video(Ref *sender);
+    void checkVideo(float dt);
     
     Label *lbl_desc;
     int bonus;

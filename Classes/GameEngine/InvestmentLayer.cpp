@@ -9,6 +9,7 @@
 #include "InvestmentLayer.hpp"
 #include "Constants.h"
 #include "CashManager.hpp"
+#include "GameScene.hpp"
 
 #define CELL_HEIGHT     200 * G_SCALEY
 
@@ -140,7 +141,14 @@ void InvestmentLayer::showContent()
                                                      "cross.png",
                                                      [&](Ref *sender)
                                                      {
+                                                         SimpleAudioEngine::getInstance()->playEffect("click.mp3");
                                                          Director::getInstance()->getEventDispatcher()->resumeEventListenersForTarget(this->getParent());
+                                                         
+                                                         if (dynamic_cast<GameScene*>(this->getParent())) {
+                                                             GameScene* gamescene = (GameScene*)this->getParent();
+                                                             gamescene->setButtonEnable(true);
+                                                         }
+                                                         
                                                          this->removeFromParent();
                                                      });
     btn_close->setPosition(G_SWIDTH * 0.95, lbl_title->getPositionY());
@@ -293,6 +301,7 @@ void InvestmentLayer::tableCellTouched(cocos2d::extension::TableView *table, coc
     
     UserDefault *userdefault = UserDefault::getInstance();
     CashManager *cashmanager = CashManager::getInstance();
+    SimpleAudioEngine::getInstance()->playEffect("click.mp3");
     
     int index = (int)cell->getIdx();
     float currentCash = cashmanager->getCurrentCash();

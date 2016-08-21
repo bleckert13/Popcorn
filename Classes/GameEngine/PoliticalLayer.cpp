@@ -9,6 +9,8 @@
 #include "PoliticalLayer.hpp"
 #include "Constants.h"
 #include "CashManager.hpp"
+#include "BucketScene.hpp"
+#include "GameScene.hpp"
 
 #define CELL_HEIGHT     200 * G_SCALEY
 
@@ -146,7 +148,18 @@ void PoliticalLayer::showContent()
                                                      "cross.png",
                                                      [&](Ref *sender)
                                                      {
+                                                         SimpleAudioEngine::getInstance()->playEffect("click.mp3");
                                                          Director::getInstance()->getEventDispatcher()->resumeEventListenersForTarget(this->getParent());
+                                                         
+                                                         if (dynamic_cast<BucketScene*>(this->getParent()))
+                                                         {
+                                                             BucketScene *bucket = (BucketScene*)this->getParent();
+                                                             bucket->setButtonEnable(true);
+                                                         }else if (dynamic_cast<GameScene*>(this->getParent())) {
+                                                             GameScene* gamescene = (GameScene*)this->getParent();
+                                                             gamescene->setButtonEnable(true);
+                                                         }
+                                                         
                                                          this->removeFromParent();
                                                      });
     btn_close->setPosition(G_SWIDTH * 0.95, lbl_title->getPositionY());
@@ -301,6 +314,7 @@ void PoliticalLayer::tableCellTouched(cocos2d::extension::TableView *table, coco
     
     UserDefault *userdefault = UserDefault::getInstance();
     CashManager *cashmanager = CashManager::getInstance();
+    SimpleAudioEngine::getInstance()->playEffect("click.mp3");
     
     int index = (int)cell->getIdx();
     float currentCash = cashmanager->getCurrentCash();

@@ -18,11 +18,15 @@ using namespace CocosDenshion;
 
 class TutorialScene:public LayerColor
 {
+private:
+    Sprite *m_spt_tutorial;
+    MenuItemImage* m_btn_next;
+    void onNextButton(Ref *sender);
+    int m_tutorIndex;
 public:
     virtual bool init();
     static Scene* createScene();
     CREATE_FUNC(TutorialScene);
-
 };
 
 #endif /* TutorialScene_hpp */

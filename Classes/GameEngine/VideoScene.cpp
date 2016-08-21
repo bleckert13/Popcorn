@@ -9,6 +9,10 @@
 #include "VideoScene.hpp"
 #include "Constants.h"
 #include "CashManager.hpp"
+#include "PluginChartboost/PluginChartboost.h"
+#include "GameScene.hpp"
+
+using namespace sdkbox;
 
 Scene* VideoScene::createScene()
 {
@@ -31,6 +35,11 @@ bool VideoScene::init()
         return false;
     }
     
+    Sprite *spt_bgBucket = Sprite::create("bucktbg.png");
+    spt_bgBucket->setPosition(G_SWIDTH / 2, G_SHEIGHT / 2);
+    spt_bgBucket->setScale(G_SWIDTH / 1024 , G_SHEIGHT / 1024);
+    this->addChild(spt_bgBucket);
+    
     Sprite *bg_title = Sprite::create("PerSecondLabel.png");
     bg_title->setScale(G_SCALEM * 0.9);
     bg_title->setPosition(G_SWIDTH / 2, G_SHEIGHT * 6 / 7);
@@ -52,8 +61,16 @@ bool VideoScene::init()
                                                      "cross.png",
                                                      [&](Ref *sender)
                                                      {
-                                                         SimpleAudioEngine::getInstance()->playEffect("Click.mp3");
-                                                         log("Close Button Clicked");
+                                                         SimpleAudioEngine::getInstance()->playEffect("click.mp3");
+                                                         log("Video -- Close Button Clicked");
+                                                         Director::getInstance()->getEventDispatcher()->resumeEventListenersForTarget(this->getParent());
+                                                         
+                                                         if (dynamic_cast<GameScene*>(this->getParent())) {
+                                                             GameScene* gamescene = (GameScene*)this->getParent();
+                                                             gamescene->setButtonEnable(true);
+                                                         }
+                                                         
+                                                         this->removeFromParent();
                                                      });
     btn_close->setPosition(G_SWIDTH * 0.9, G_SHEIGHT * 0.95);
     btn_close->setScale(G_SCALEM * 1.5);
@@ -62,7 +79,7 @@ bool VideoScene::init()
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu);
     
-    lbl_desc = Label::createWithTTF("", "AmericanTypewriter.ttf", G_SWIDTH / 20);
+    lbl_desc = Label::createWithTTF("", "AmericanTypewriter.ttf", G_SWIDTH / 10);
     lbl_desc->setPosition(G_SWIDTH / 2, bg_title->getPositionY() - bg_title->getBoundingBox().size.height / 2 - 20 * G_SCALEM);
     lbl_desc->setAnchorPoint(Vec2(0.5f, 1.0f));
     lbl_desc->setWidth(G_SWIDTH * 0.9);
@@ -74,6 +91,8 @@ bool VideoScene::init()
         bonus = CCRANDOM_0_1() * 50;
         UserDefault::getInstance()->setIntegerForKey("VBonus", bonus);
     }
+    
+    this->schedule(schedule_selector(VideoScene::checkVideo), 0.1);
     
     if (UserDefault::getInstance()->getIntegerForKey("VBonus") <= 5) {
         
@@ -122,28 +141,35 @@ void VideoScene::video(cocos2d::Ref *sender)
     
     if (UserDefault::getInstance()->getIntegerForKey("VBonus") <= 5) {
         UserDefault::getInstance()->setBoolForKey("KBVideo", true);
-        SimpleAudioEngine::getInstance()->playEffect("Click.mp3");
-//        [Chartboost showRewardedVideo:CBLocationHomeScreen];
+        SimpleAudioEngine::getInstance()->playEffect("click.mp3");
+        PluginChartboost::show("Rewarded Video");
     }
     
     if (UserDefault::getInstance()->getIntegerForKey("VBonus") > 5 && UserDefault::getInstance()->getIntegerForKey("VBonus") <=28) {
         UserDefault::getInstance()->setBoolForKey("ShakerBonus", true);
-        SimpleAudioEngine::getInstance()->playEffect("Click.mp3");
-//                [Chartboost showRewardedVideo:CBLocationHomeScreen];
+        SimpleAudioEngine::getInstance()->playEffect("click.mp3");
+        PluginChartboost::show("Rewarded Video");
     }
     if (UserDefault::getInstance()->getIntegerForKey("VBonus") > 28 && UserDefault::getInstance()->getIntegerForKey("VBonus") <= 35) {
         UserDefault::getInstance()->setBoolForKey("GoldBonus", true);
-        SimpleAudioEngine::getInstance()->playEffect("Click.mp3");
-        //        [Chartboost showRewardedVideo:CBLocationHomeScreen];
+        SimpleAudioEngine::getInstance()->playEffect("click.mp3");
+        PluginChartboost::show("Rewarded Video");
     }
     if (UserDefault::getInstance()->getIntegerForKey("VBonus") > 35 && UserDefault::getInstance()->getIntegerForKey("VBonus") <=42) {
         UserDefault::getInstance()->setBoolForKey("2xBonus", true);
-        SimpleAudioEngine::getInstance()->playEffect("Click.mp3");
-        //        [Chartboost showRewardedVideo:CBLocationHomeScreen];
+        SimpleAudioEngine::getInstance()->playEffect("click.mp3");
+        PluginChartboost::show("Rewarded Video");
     }
     if (UserDefault::getInstance()->getIntegerForKey("VBonus") > 42 && UserDefault::getInstance()->getIntegerForKey("VBonus") <= 50) {
         UserDefault::getInstance()->setBoolForKey("20xBonus", true);
-        SimpleAudioEngine::getInstance()->playEffect("Click.mp3");
-        //        [Chartboost showRewardedVideo:CBLocationHomeScreen];
+        SimpleAudioEngine::getInstance()->playEffect("click.mp3");
+        PluginChartboost::show("Rewarded Video");
+    }
+}
+
+void VideoScene::checkVideo(float dt)
+{
+    if (UserDefault::getInstance()->getBoolForKey("Video")) {
+        this->removeFromParent();
     }
 }
