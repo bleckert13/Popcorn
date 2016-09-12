@@ -2,7 +2,7 @@
 //  BusinessLayer.hpp
 //  Popcorn
 //
-//  Created by Monkey on 7/30/16.
+//  Created by Hans on 7/30/16.
 //
 //
 

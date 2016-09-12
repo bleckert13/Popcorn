@@ -2,7 +2,7 @@
 //  PoliticalLayer.cpp
 //  Popcorn
 //
-//  Created by Monkey on 7/30/16.
+//  Created by Hans on 7/30/16.
 //
 //
 
@@ -102,28 +102,7 @@ bool PoliticalLayer::init()
     list_profit1.push_back("10KB Kernels/Hour");
     list_profit1.push_back("45KB Kernel Capacity");
     list_profit1.push_back("800KB Kernels/Hour");
-    
-    list_profit2.push_back("Completed");
-    list_profit2.push_back("Completed");
-    list_profit2.push_back("Completed");
-    list_profit2.push_back("Completed");
-    list_profit2.push_back("Completed");
-    list_profit2.push_back("Completed");
-    list_profit2.push_back("Completed");
-    list_profit2.push_back("Completed");
-    list_profit2.push_back("Completed");
-    list_profit2.push_back("Completed");
-    list_profit2.push_back("Completed");
-    list_profit2.push_back("Completed");
-    list_profit2.push_back("Completed");
-    list_profit2.push_back("Completed");
-    list_profit2.push_back("Completed");
-    list_profit2.push_back("Completed");
-    
-    
-    log("Name Count %ld", list_name.size());
-    log("Name Count %ld", list_countkey.size());
-    log("Name Count %ld", list_pricekey.size());
+        
     return true;
 }
 
@@ -136,11 +115,11 @@ void PoliticalLayer::showContent()
     bg_title->setPosition(Vec2(0, this->getContentSize().height));
     this->addChild(bg_title);
     
-    Label *lbl_title = Label::createWithTTF("RECIPE INVESTMENTS", "AmericanTypewriter.ttf", G_SWIDTH / 15);
+    Label *lbl_title = Label::createWithTTF("STATUS INVESTMENTS", "AmericanTypewriter.ttf", G_SWIDTH / 15);
     lbl_title->setPosition(G_SWIDTH / 2, bg_title->getPositionY() - 50 * G_SCALEY);
     this->addChild(lbl_title);
     
-    Label *lbl_desc = Label::createWithTTF("Earn More Kernels Per Click", "AmericanTypewriter.ttf", G_SWIDTH / 20);
+    Label *lbl_desc = Label::createWithTTF("Earn Kernels With The App Closed", "AmericanTypewriter.ttf", G_SWIDTH / 20);
     lbl_desc->setPosition(G_SWIDTH / 2, lbl_title->getPositionY() - lbl_title->getBoundingBox().size.height);
     this->addChild(lbl_desc);
     
@@ -267,7 +246,7 @@ TableViewCell* PoliticalLayer::tableCellAtIndex(cocos2d::extension::TableView *t
     lbl_count->setAnchorPoint(Vec2(0, 0.5));
     cell->addChild(lbl_count);
     
-    Label *lbl_price = Label::createWithTTF(StringUtils::format("%s Kernels", CashManager::getInstance()->ConvertAmountToShortString(price).c_str()),
+    Label *lbl_price = Label::createWithTTF(StringUtils::format("%s Kernels", CashManager::getInstance()->convertAmountToShortString(price).c_str()),
                                             "AmericanTypewriter.ttf",
                                             G_SWIDTH / 25);
     lbl_price->setWidth(spt_ribb_l->getBoundingBox().size.width * 0.8);
@@ -278,19 +257,22 @@ TableViewCell* PoliticalLayer::tableCellAtIndex(cocos2d::extension::TableView *t
     cell->addChild(lbl_price);
     
     Label *lbl_profit;
-    if (count == 0) {
+    if (count == 1 && idx == 0){
+        lbl_profit = Label::createWithTTF("Completed", "AmericanTypewriter.ttf", G_SWIDTH / 25);
+    }else
+    {
         lbl_profit = Label::createWithTTF(list_profit1[idx].c_str(), "AmericanTypewriter.ttf", G_SWIDTH / 25);
         
-        Label *lbl_shaker = Label::createWithTTF("+1", "AmericanTypewriter.ttf", G_SWIDTH / 25);
-        lbl_shaker->setPosition(G_SWIDTH * 0.7, lbl_name->getPositionY());
-        cell->addChild(lbl_shaker);
-        
-        Sprite *spt_shaker = Sprite::create("shaker.png");
-        spt_shaker->setScale(G_SCALEM * 0.07);
-        spt_shaker->setPosition(lbl_shaker->getPositionX() + lbl_shaker->getBoundingBox().size.width + 60 * G_SCALEX, lbl_shaker->getPositionY());
-        cell->addChild(spt_shaker);
-    }else if (count == 1 && idx == 0){
-        lbl_profit = Label::createWithTTF(list_profit2[idx].c_str(), "AmericanTypewriter.ttf", G_SWIDTH / 25);
+        if (count < 1) {
+            Label *lbl_shaker = Label::createWithTTF("+1", "AmericanTypewriter.ttf", G_SWIDTH / 25);
+            lbl_shaker->setPosition(G_SWIDTH * 0.7, lbl_name->getPositionY());
+            cell->addChild(lbl_shaker);
+            
+            Sprite *spt_shaker = Sprite::create("shaker.png");
+            spt_shaker->setScale(G_SCALEM * 0.07);
+            spt_shaker->setPosition(lbl_shaker->getPositionX() + lbl_shaker->getBoundingBox().size.width + 60 * G_SCALEX, lbl_shaker->getPositionY());
+            cell->addChild(spt_shaker);
+        }
     }
     
     lbl_profit->setWidth(spt_ribb_r->getBoundingBox().size.width * 0.8);
@@ -319,16 +301,10 @@ void PoliticalLayer::tableCellTouched(cocos2d::extension::TableView *table, coco
     int index = (int)cell->getIdx();
     float currentCash = cashmanager->getCurrentCash();
     float price = userdefault->getFloatForKey(list_pricekey[index].c_str());
-    float count = userdefault->getIntegerForKey(list_countkey[index].c_str());
+    int count = userdefault->getIntegerForKey(list_countkey[index].c_str());
     float currentShaker = cashmanager->getCurrentShaker();
     
-    if (count < 3) {
-        if (index > 0) {
-            if (userdefault->getIntegerForKey(list_countkey[index - 1].c_str()) < 3) {
-                MessageBox("Upgrade the previous investment completely to purchase this one.", "");
-                return;
-            }
-        }
+    if ((index >= 1 && count < 999) || (index == 0 && count < 1)) {
         if (currentCash < price) {
             MessageBox("Not Enough Kernels", "");
             return;
@@ -344,6 +320,9 @@ void PoliticalLayer::tableCellTouched(cocos2d::extension::TableView *table, coco
     }
     
     cashmanager->reloadCashPerSecondAndCashPerSwap();
+    
+    Vec2 offset = table->getContentOffset();
     table->reloadData();
+    table->setContentOffset(offset);
     
 }

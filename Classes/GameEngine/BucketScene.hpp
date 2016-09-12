@@ -2,7 +2,7 @@
 //  BucketScene.hpp
 //  Popcorn
 //
-//  Created by Monkey on 8/8/16.
+//  Created by Hans on 8/8/16.
 //
 //
 

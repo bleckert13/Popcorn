@@ -1,7 +1,6 @@
 {
     "android": {
         "Chartboost": {
-            "signature": "d006127c3b295487e2397b2e05f6fd0b49ff4cf5",
             "ads": {
                 "Default": {
                     "type": "interstitial"
@@ -13,50 +12,48 @@
                     "type": "more_app"
                 }
             },
-            "id": "57ae437e04b01619de2e91e9"
-        },
-        "Facebook": {
-            "debug": false
+            "id": "57ae437e04b01619de2e91e9",
+            "signature": "d006127c3b295487e2397b2e05f6fd0b49ff4cf5"
         },
         "iap": {
             "items": {
+                "Kernel Blast": {
+                    "id": "com.kernelking.10m"
+                },
                 "Kernel Bomb": {
                     "id": "com.kernelking.20m"
                 },
-                "Salt Mine": {
-                    "id": "com.kernelking.mine"
+                "Double Kernels": {
+                    "id": "com.kernelking.6m"
                 },
-                "Kernel Blast": {
-                    "id": "com.kernelking.10m"
+                "Double Kernels Per Second": {
+                    "id": "com.kernelking.4m"
                 },
                 "Forever 20x": {
                     "type": "non_consumable",
                     "id": "com.kernelking.forever20"
                 },
-                "Treadmill": {
-                    "type": "non_consumable",
-                    "id": "com.kernelking.treadmill"
-                },
-                "Double Kernels Per Second": {
-                    "id": "com.kernelking.4m"
-                },
                 "Remove Ads": {
                     "type": "non_consumable",
                     "id": "com.kernelking.ads"
-                },
-                "King Kernel": {
-                    "type": "non_consumable",
-                    "id": "com.kernelking.king"
-                },
-                "Shaker of Salt": {
-                    "id": "com.kernelking.shaker"
                 },
                 "Kernel Sale": {
                     "type": "non_consumable",
                     "id": "com.kernelking.sale"
                 },
-                "Double Kernels": {
-                    "id": "com.kernelking.6m"
+                "King Kernel": {
+                    "type": "non_consumable",
+                    "id": "com.kernelking.king"
+                },
+                "Treadmill": {
+                    "type": "non_consumable",
+                    "id": "com.kernelking.treadmill"
+                },
+                "Salt Mine": {
+                    "id": "com.kernelking.mine"
+                },
+                "Shaker of Salt": {
+                    "id": "com.kernelking.shaker"
                 }
             },
             "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnk2nKJRXaSekdHiqPGbS/yGw8NT4Kg7kMjFf0a2n4sQ48RlKqS0eE5qNGOj02pRtLu1BrbyfYo4yImT6Wr3Ys509jKXvWYDs2Czz9apAAXSFt45hRWPe4cdgtDtFUA5bBFTt9hMJuHkcWF0nIbmVfFVSB60EKOTe/R9L4/NzjfPORVoQMCt9BN3mefLq1EsajPfSRjP0mP6JO9IQLh1qTRFyYKUAoP+7X95Rp3A85SmLFxksIgyU0rS2GphYDKNH8KH3SDU45WtGhj5U1YuMR/pmtj48QZgRe20nmGZNmu7cUp9CSzLZOyn2GhHd/m844vmwQ335uYF9R7127Oh8qwIDAQAB"
@@ -64,7 +61,6 @@
     },
     "ios": {
         "Chartboost": {
-            "signature": "b9fc12d7aed01843dbf00ecb4e434d0827f05585",
             "ads": {
                 "Default": {
                     "type": "interstitial"
@@ -76,50 +72,48 @@
                     "type": "more_app"
                 }
             },
-            "id": "566b471f2fdf340d46e471ec"
-        },
-        "Facebook": {
-            "debug": true
+            "id": "566b471f2fdf340d46e471ec",
+            "signature": "b9fc12d7aed01843dbf00ecb4e434d0827f05585"
         },
         "iap": {
             "items": {
+                "Kernel Blast": {
+                    "id": "com.kernelking.10m"
+                },
                 "Kernel Bomb": {
                     "id": "com.kernelking.20m"
                 },
-                "Salt Mine": {
-                    "id": "com.kernelking.mine"
+                "Double Kernels": {
+                    "id": "com.kernelking.6m"
                 },
-                "Kernel Blast": {
-                    "id": "com.kernelking.10m"
+                "Double Kernels Per Second": {
+                    "id": "com.kernelking.4m"
                 },
                 "Forever 20x": {
                     "type": "non_consumable",
                     "id": "com.kernelking.forever20"
                 },
-                "Treadmill": {
-                    "type": "non_consumable",
-                    "id": "com.kernelking.treadmill"
-                },
-                "Double Kernels Per Second": {
-                    "id": "com.kernelking.4m"
-                },
                 "Remove Ads": {
                     "type": "non_consumable",
                     "id": "com.kernelking.ads"
-                },
-                "King Kernel": {
-                    "type": "non_consumable",
-                    "id": "com.kernelking.king"
-                },
-                "Shaker of Salt": {
-                    "id": "com.kernelking.shaker"
                 },
                 "Kernel Sale": {
                     "type": "non_consumable",
                     "id": "com.kernelking.sale"
                 },
-                "Double Kernels": {
-                    "id": "com.kernelking.6m"
+                "King Kernel": {
+                    "type": "non_consumable",
+                    "id": "com.kernelking.king"
+                },
+                "Treadmill": {
+                    "type": "non_consumable",
+                    "id": "com.kernelking.treadmill"
+                },
+                "Salt Mine": {
+                    "id": "com.kernelking.mine"
+                },
+                "Shaker of Salt": {
+                    "id": "com.kernelking.shaker"
                 }
             }
         }

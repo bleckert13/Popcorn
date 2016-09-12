@@ -17,11 +17,6 @@ using namespace sdkbox;
 
 USING_NS_CC;
 
-//static cocos2d::Size designResolutionSize = cocos2d::Size(480, 320);
-//static cocos2d::Size smallResolutionSize = cocos2d::Size(480, 320);
-//static cocos2d::Size mediumResolutionSize = cocos2d::Size(1024, 768);
-//static cocos2d::Size largeResolutionSize = cocos2d::Size(2048, 1536);
-
 AppDelegate::AppDelegate() {
 
 }
@@ -66,30 +61,12 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
     // set FPS. the default value is 1.0/60 if you don't call this
     director->setAnimationInterval(1.0 / 60);
-
-    // Set the design resolution
-//    glview->setDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, ResolutionPolicy::NO_BORDER);
-//    Size frameSize = glview->getFrameSize();
-//    // if the frame's height is larger than the height of medium size.
-//    if (frameSize.height > mediumResolutionSize.height)
-//    {        
-//        director->setContentScaleFactor(MIN(largeResolutionSize.height/designResolutionSize.height, largeResolutionSize.width/designResolutionSize.width));
-//    }
-//    // if the frame's height is larger than the height of small size.
-//    else if (frameSize.height > smallResolutionSize.height)
-//    {        
-//        director->setContentScaleFactor(MIN(mediumResolutionSize.height/designResolutionSize.height, mediumResolutionSize.width/designResolutionSize.width));
-//    }
-//    // if the frame's height is smaller than the height of medium size.
-//    else
-//    {        
-//        director->setContentScaleFactor(MIN(smallResolutionSize.height/designResolutionSize.height, smallResolutionSize.width/designResolutionSize.width));
-//    }
-        
+    
     register_all_packages();
     
 // SDKBOX init
     PluginChartboost::init();
+    PluginChartboost::setListener(this);
     IAP::init();
     
     FileUtils *sharedFileUtils = FileUtils::getInstance();
@@ -111,9 +88,6 @@ bool AppDelegate::applicationDidFinishLaunching() {
     sharedFileUtils->setSearchPaths(searchPaths);
     
     initAppInfo();
-// Test
-//    CashManager *cashmanager = CashManager::getInstance();
-//    cashmanager->setCurrentCash(1000000000000000);
     
     // create a scene. it's an autorelease object
     
@@ -124,7 +98,6 @@ bool AppDelegate::applicationDidFinishLaunching() {
     }else
     {
         scene = GameScene::createScene();
-//        scene = BucketScene::createScene();
     }
     
     // run
@@ -507,8 +480,7 @@ void AppDelegate::applicationWillEnterForeground() {
         list_countkey.push_back("soda_count");
         list_countkey.push_back("railroad_count");
         list_countkey.push_back("strip_count");
-        list_countkey.push_back("arctic_count");
-        list_countkey.push_back("candytheft_price");
+        list_countkey.push_back("arctic_count");        
         list_countkey.push_back("oldlady_count");
         list_countkey.push_back("clown_count");
         list_countkey.push_back("nsa_count");
@@ -538,8 +510,9 @@ void AppDelegate::applicationWillEnterForeground() {
         list_countkey.push_back("prestige_count");
         
         for (int index = 0; index < list_countkey.size(); index++) {
-            if (userdefault->getIntegerForKey(list_countkey[index].c_str(), 0) == 0) {
+            if (userdefault->getIntegerForKey(list_countkey[index].c_str(), 0) > 0) {
                 float shaker = cashmanager->getCurrentShaker();
+                log("Shaker + 1 : %s", list_countkey[index].c_str());
                 cashmanager->setCurrentShaker(shaker + 1);
             }
         }
@@ -569,12 +542,14 @@ void AppDelegate::applicationWillEnterForeground() {
         for (int index = 0; index < list_countkey.size(); index++) {
             if (userdefault->getFloatForKey(list_countkey[index].c_str(), 0) == 0) {
                 float shaker = cashmanager->getCurrentShaker();
+                log("Shaker + 1 : %s", list_countkey[index].c_str());
                 cashmanager->setCurrentShaker(shaker + 1);
             }
         }
         
         if (userdefault->getBoolForKey("Forever20") || userdefault->getBoolForKey("RemoveAds")) {
             float shaker = cashmanager->getCurrentShaker();
+            log("Shaker + 1 : Forever20");
             cashmanager->setCurrentShaker(shaker + 1);
         }
         
@@ -582,3 +557,100 @@ void AppDelegate::applicationWillEnterForeground() {
     }
     
 }
+
+void  AppDelegate::onChartboostCached(const std::string& name){
+    if (name == "Rewarded Video") {
+        log("Cached Rewarded Video!");
+    }
+}
+bool  AppDelegate::onChartboostShouldDisplay(const std::string& name){
+    return true;
+}
+void  AppDelegate::onChartboostDisplay(const std::string& name){
+    
+}
+void  AppDelegate::onChartboostDismiss(const std::string& name){
+    
+}
+void  AppDelegate::onChartboostClose(const std::string& name){
+    
+}
+void  AppDelegate::onChartboostClick(const std::string& name){
+    
+}
+void  AppDelegate::onChartboostReward(const std::string& name, int reward){
+    UserDefault *userdefault = UserDefault::getInstance();
+    if (userdefault->getBoolForKey("DBLVideo")) {
+        userdefault->setBoolForKey("CollectDBL", true);
+        userdefault->setBoolForKey("DBLVideo", false);
+    }
+    if (userdefault->getBoolForKey("KBVideo")) {
+        userdefault->setBoolForKey("20XVideo", true);
+        userdefault->setBoolForKey("Video", true);
+        userdefault->setBoolForKey("KBVideo", false);
+    }
+    if (userdefault->getBoolForKey("ShakerBonus")) {
+        userdefault->setBoolForKey("PlayedShaker", true);
+        userdefault->setBoolForKey("Video", true);
+        userdefault->setBoolForKey("ShakerBonus", false);
+    }
+    if (userdefault->getBoolForKey("GoldBonus")) {
+        userdefault->setBoolForKey("PlayedGold", true);
+        userdefault->setBoolForKey("Video", true);
+        userdefault->setBoolForKey("GoldBonus", false);
+    }
+    if (userdefault->getBoolForKey("2xBonus")) {
+        userdefault->setBoolForKey("Played2x", true);
+        userdefault->setBoolForKey("Video", true);
+        userdefault->setBoolForKey("2xBonus", false);
+    }
+    if (userdefault->getBoolForKey("20xBonus")) {
+        userdefault->setBoolForKey("Played20x", true);
+        userdefault->setBoolForKey("Video", true);
+        userdefault->setBoolForKey("20xBonus", false);
+    }
+}
+void  AppDelegate::onChartboostFailedToLoad(const std::string& name, sdkbox::CB_LoadError error){
+    switch(error){
+        case CB_LoadErrorInternetUnavailable: {
+            log("Failed to load Rewarded Video, no Internet connection !");
+        } break;
+        case CB_LoadErrorInternal: {
+            log("Failed to load Rewarded Video, internal error !");
+        } break;
+        case CB_LoadErrorNetworkFailure: {
+            log("Failed to load Rewarded Video, network error !");
+        } break;
+        case CB_LoadErrorWrongOrientation: {
+            log("Failed to load Rewarded Video, wrong orientation !");
+        } break;
+        case CB_LoadErrorTooManyConnections: {
+            log("Failed to load Rewarded Video, too many connections !");
+        } break;
+        case CB_LoadErrorFirstSessionInterstitialsDisabled: {
+            log("Failed to load Rewarded Video, first session !");
+        } break;        case CB_LoadErrorNoAdFound : {
+            log("Failed to load Rewarded Video, no ad found !");
+        } break;
+        case CB_LoadErrorSessionNotStarted : {
+            log("Failed to load Rewarded Video, session not started !");
+        } break;
+        case CB_LoadErrorNoLocationFound : {
+            log("Failed to load Rewarded Video, missing location parameter !");
+        } break;
+        default: {
+            log("Failed to load Rewarded Video, unknown error !");
+        }
+    }
+}
+void  AppDelegate::onChartboostFailToRecordClick(const std::string& name, sdkbox::CB_ClickError e){
+    
+}
+void  AppDelegate::onChartboostConfirmation(){
+    
+}
+void  AppDelegate::onChartboostCompleteStore(){
+    
+}
+
+

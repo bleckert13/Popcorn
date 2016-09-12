@@ -2,7 +2,7 @@
 //  VideoScene.cpp
 //  Popcorn
 //
-//  Created by Monkey on 7/28/16.
+//  Created by Hans on 7/28/16.
 //
 //
 
@@ -35,6 +35,8 @@ bool VideoScene::init()
         return false;
     }
     
+    PluginChartboost::cache("Rewarded Video");
+    
     Sprite *spt_bgBucket = Sprite::create("bucktbg.png");
     spt_bgBucket->setPosition(G_SWIDTH / 2, G_SHEIGHT / 2);
     spt_bgBucket->setScale(G_SWIDTH / 1024 , G_SHEIGHT / 1024);
@@ -55,7 +57,7 @@ bool VideoScene::init()
                                                   "tvPlay.png",
                                                   CC_CALLBACK_1(VideoScene::video, this));
     btn_tv->setPosition(G_SWIDTH / 2, G_SHEIGHT / 2);
-    
+    btn_tv->setScale(G_SCALEM * 0.6);
     
     MenuItemImage* btn_close = MenuItemImage::create("cross.png",
                                                      "cross.png",
@@ -99,7 +101,7 @@ bool VideoScene::init()
         // Do any additional setup after loading the view from its nib.
         double cash= CashManager::getInstance()->getCurrentCash();
         
-        lbl_desc->setString(StringUtils::format("Get %s Kernels Instantly", CashManager::getInstance()->ConvertAmountToShortString(cash*.15).c_str()));
+        lbl_desc->setString(StringUtils::format("Get %s Kernels Instantly", CashManager::getInstance()->convertAmountToShortString(cash*.15).c_str()));
         
     }
     if (UserDefault::getInstance()->getIntegerForKey("VBonus") > 5 && UserDefault::getInstance()->getIntegerForKey("VBonus") <=28) {
@@ -139,37 +141,44 @@ void VideoScene::video(cocos2d::Ref *sender)
 {
     log("Video Button Clicked");
     
-    if (UserDefault::getInstance()->getIntegerForKey("VBonus") <= 5) {
+    if (UserDefault::getInstance()->getIntegerForKey("VBonus") <= 5 && PluginChartboost::isAvailable("Rewarded Video")) {
         UserDefault::getInstance()->setBoolForKey("KBVideo", true);
         SimpleAudioEngine::getInstance()->playEffect("click.mp3");
         PluginChartboost::show("Rewarded Video");
     }
     
-    if (UserDefault::getInstance()->getIntegerForKey("VBonus") > 5 && UserDefault::getInstance()->getIntegerForKey("VBonus") <=28) {
+    if (UserDefault::getInstance()->getIntegerForKey("VBonus") > 5 && UserDefault::getInstance()->getIntegerForKey("VBonus") <=28  && PluginChartboost::isAvailable("Rewarded Video")) {
         UserDefault::getInstance()->setBoolForKey("ShakerBonus", true);
         SimpleAudioEngine::getInstance()->playEffect("click.mp3");
         PluginChartboost::show("Rewarded Video");
     }
-    if (UserDefault::getInstance()->getIntegerForKey("VBonus") > 28 && UserDefault::getInstance()->getIntegerForKey("VBonus") <= 35) {
+    if (UserDefault::getInstance()->getIntegerForKey("VBonus") > 28 && UserDefault::getInstance()->getIntegerForKey("VBonus") <= 35 && PluginChartboost::isAvailable("Rewarded Video")) {
         UserDefault::getInstance()->setBoolForKey("GoldBonus", true);
         SimpleAudioEngine::getInstance()->playEffect("click.mp3");
         PluginChartboost::show("Rewarded Video");
     }
-    if (UserDefault::getInstance()->getIntegerForKey("VBonus") > 35 && UserDefault::getInstance()->getIntegerForKey("VBonus") <=42) {
+    if (UserDefault::getInstance()->getIntegerForKey("VBonus") > 35 && UserDefault::getInstance()->getIntegerForKey("VBonus") <=42 && PluginChartboost::isAvailable("Rewarded Video")) {
         UserDefault::getInstance()->setBoolForKey("2xBonus", true);
         SimpleAudioEngine::getInstance()->playEffect("click.mp3");
         PluginChartboost::show("Rewarded Video");
     }
-    if (UserDefault::getInstance()->getIntegerForKey("VBonus") > 42 && UserDefault::getInstance()->getIntegerForKey("VBonus") <= 50) {
+    if (UserDefault::getInstance()->getIntegerForKey("VBonus") > 42 && UserDefault::getInstance()->getIntegerForKey("VBonus") <= 50 && PluginChartboost::isAvailable("Rewarded Video")) {
         UserDefault::getInstance()->setBoolForKey("20xBonus", true);
         SimpleAudioEngine::getInstance()->playEffect("click.mp3");
         PluginChartboost::show("Rewarded Video");
     }
+    PluginChartboost::cache("Rewarded Video");
 }
 
 void VideoScene::checkVideo(float dt)
 {
     if (UserDefault::getInstance()->getBoolForKey("Video")) {
+        Director::getInstance()->getEventDispatcher()->resumeEventListenersForTarget(this->getParent());
+        
+        if (dynamic_cast<GameScene*>(this->getParent())) {
+            GameScene* gamescene = (GameScene*)this->getParent();
+            gamescene->setButtonEnable(true);
+        }
         this->removeFromParent();
     }
 }

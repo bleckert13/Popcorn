@@ -2,7 +2,7 @@
 //  CashManager.hpp
 //  Popcorn
 //
-//  Created by Monkey on 7/25/16.
+//  Created by Hans on 7/25/16.
 //
 //
 
@@ -32,14 +32,15 @@ public:
     CashManager();
     ~CashManager();
     static CashManager* getInstance();
-    string ConvertAmountToShortString(float amount);
-    string ConvertNewAmountToShortString(float newamount);
+    string convertAmountToShortString(float amount);    
     void reloadCashPerSecondAndCashPerSwap();
     void saveCurrentCash();
     float moneyPerSecond();
     float moneyPerHour();
     float bucketSize();
     float moneyPerSwap();
+    
+    void updateMoneyPerSecond(int index);
     
     float getCurrentCash();
     float getCashPerSwap();

@@ -2,7 +2,7 @@
 //  PoliticalLayer.hpp
 //  Popcorn
 //
-//  Created by Monkey on 7/30/16.
+//  Created by Hans on 7/30/16.
 //
 //
 
@@ -35,8 +35,7 @@ private:
     vector<string> list_countkey;
     vector<string> list_pricekey;
     vector<string> list_profit1;
-    vector<string> list_profit2;
-    
+        
 public:
     virtual bool init();
     static Scene* createScene();

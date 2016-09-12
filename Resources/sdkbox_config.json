@@ -5,18 +5,24 @@
                 "Default": {
                     "type": "interstitial"
                 },
-                "Level Complete": {
+                "Rewarded Video": {
                     "type": "rewarded_video"
                 },
                 "MoreApp": {
                     "type": "more_app"
                 }
             },
-            "id": "4f7b433509b6025804000002",
-            "signature": "dd2d41b69ac01b80f443f5b6cf06096d457f82bd"
+            "id": "57ae437e04b01619de2e91e9",
+            "signature": "d006127c3b295487e2397b2e05f6fd0b49ff4cf5"
         },
         "iap": {
             "items": {
+                "Kernel Blast": {
+                    "id": "com.kernelking.10m"
+                },
+                "Kernel Bomb": {
+                    "id": "com.kernelking.20m"
+                },
                 "Double Kernels": {
                     "id": "com.kernelking.6m"
                 },
@@ -27,11 +33,9 @@
                     "type": "non_consumable",
                     "id": "com.kernelking.forever20"
                 },
-                "Kernel Blast": {
-                    "id": "com.kernelking.10m"
-                },
-                "Kernel Bomb": {
-                    "id": "com.kernelking.20m"
+                "Remove Ads": {
+                    "type": "non_consumable",
+                    "id": "com.kernelking.ads"
                 },
                 "Kernel Sale": {
                     "type": "non_consumable",
@@ -41,19 +45,15 @@
                     "type": "non_consumable",
                     "id": "com.kernelking.king"
                 },
-                "Remove Ads": {
-                    "type": "non_consumable",
-                    "id": "com.kernelking.ads"
-                },
-                "Salt Mine": {
-                    "id": "com.kernelking.ads"
-                },
-                "Shaker of Salt": {
-                    "id": "com.kernelking.shakers"
-                },
                 "Treadmill": {
                     "type": "non_consumable",
-                    "id": "com.kernelking.ads"
+                    "id": "com.kernelking.treadmill"
+                },
+                "Salt Mine": {
+                    "id": "com.kernelking.mine"
+                },
+                "Shaker of Salt": {
+                    "id": "com.kernelking.shaker"
                 }
             },
             "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnk2nKJRXaSekdHiqPGbS/yGw8NT4Kg7kMjFf0a2n4sQ48RlKqS0eE5qNGOj02pRtLu1BrbyfYo4yImT6Wr3Ys509jKXvWYDs2Czz9apAAXSFt45hRWPe4cdgtDtFUA5bBFTt9hMJuHkcWF0nIbmVfFVSB60EKOTe/R9L4/NzjfPORVoQMCt9BN3mefLq1EsajPfSRjP0mP6JO9IQLh1qTRFyYKUAoP+7X95Rp3A85SmLFxksIgyU0rS2GphYDKNH8KH3SDU45WtGhj5U1YuMR/pmtj48QZgRe20nmGZNmu7cUp9CSzLZOyn2GhHd/m844vmwQ335uYF9R7127Oh8qwIDAQAB"
@@ -65,56 +65,56 @@
                 "Default": {
                     "type": "interstitial"
                 },
-                "Level Complete": {
+                "Rewarded Video": {
                     "type": "rewarded_video"
                 },
                 "MoreApp": {
                     "type": "more_app"
                 }
             },
-            "id": "4f21c409cd1cb2fb7000001b",
-            "signature": "92e2de2fd7070327bdeb54c15a5295309c6fcd2d"
+            "id": "566b471f2fdf340d46e471ec",
+            "signature": "b9fc12d7aed01843dbf00ecb4e434d0827f05585"
         },
         "iap": {
             "items": {
-              "Double Kernels": {
-                  "id": "com.kernelking.6m"
-              },
-              "Double Kernels Per Second": {
-                  "id": "com.kernelking.4m"
-              },
-              "Forever 20x": {
-                  "type": "non_consumable",
-                  "id": "com.kernelking.forever20"
-              },
-              "Kernel Blast": {
-                  "id": "com.kernelking.10m"
-              },
-              "Kernel Bomb": {
-                  "id": "com.kernelking.20m"
-              },
-              "Kernel Sale": {
-                  "type": "non_consumable",
-                  "id": "com.kernelking.sale"
-              },
-              "King Kernel": {
-                  "type": "non_consumable",
-                  "id": "com.kernelking.king"
-              },
-              "Remove Ads": {
-                  "type": "non_consumable",
-                  "id": "com.kernelking.ads"
-              },
-              "Salt Mine": {
-                  "id": "com.kernelking.ads"
-              },
-              "Shaker of Salt": {
-                  "id": "com.kernelking.shakers"
-              },
-              "Treadmill": {
-                  "type": "non_consumable",
-                  "id": "com.kernelking.ads"
-              }
+                "Kernel Blast": {
+                    "id": "com.kernelking.10m"
+                },
+                "Kernel Bomb": {
+                    "id": "com.kernelking.20m"
+                },
+                "Double Kernels": {
+                    "id": "com.kernelking.6m"
+                },
+                "Double Kernels Per Second": {
+                    "id": "com.kernelking.4m"
+                },
+                "Forever 20x": {
+                    "type": "non_consumable",
+                    "id": "com.kernelking.forever20"
+                },
+                "Remove Ads": {
+                    "type": "non_consumable",
+                    "id": "com.kernelking.ads"
+                },
+                "Kernel Sale": {
+                    "type": "non_consumable",
+                    "id": "com.kernelking.sale"
+                },
+                "King Kernel": {
+                    "type": "non_consumable",
+                    "id": "com.kernelking.king"
+                },
+                "Treadmill": {
+                    "type": "non_consumable",
+                    "id": "com.kernelking.treadmill"
+                },
+                "Salt Mine": {
+                    "id": "com.kernelking.mine"
+                },
+                "Shaker of Salt": {
+                    "id": "com.kernelking.shaker"
+                }
             }
         }
     }

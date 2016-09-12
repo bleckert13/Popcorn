@@ -2,7 +2,7 @@
 //  GameScene.cpp
 //  Popcorn
 //
-//  Created by Monkey on 7/27/16.
+//  Created by Hans on 7/27/16.
 //
 //
 
@@ -61,6 +61,7 @@ bool GameScene::init()
     PluginChartboost::cache("Rewarded Video");
     
     int backgroundID = m_userdefault->getIntegerForKey("CustomBG", 0);
+    
     switch (backgroundID) {
         case 0:
             background1 = Sprite::create("bluebackground.png");
@@ -83,8 +84,8 @@ bool GameScene::init()
             background2 = Sprite::create("universe.png");
             break;
         case 5:
-            background1 = Sprite::create("jugle.png") ;
-            background2 = Sprite::create("jugleBack.png");
+            background1 = Sprite::create("jungle.png") ;
+            background2 = Sprite::create("jungleBack.png");
             break;
         case 6:
             background1 = Sprite::create("desert.png");
@@ -116,6 +117,27 @@ bool GameScene::init()
         this->schedule(schedule_selector(GameScene::scroll), 0.005f);
     }
     
+    // Submit Score to leaderboard.
+    float currentCash = CashManager::getInstance()->getCurrentCash();
+    float prestige = UserDefault::getInstance()->getIntegerForKey("prestige_count");
+    
+    log("Game Scene : CurrentCash = %f", currentCash);
+    log("Game Scene : Prestige = %f", prestige);
+    
+#if CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+    
+#else
+    JniMethodInfo t;
+    if (JniHelper::getStaticMethodInfo(t
+                                      ,  "org/cocos2dx/cpp/AppActivity"
+                                      ,  "reportScore"
+                                      ,  "(IF;)V"))
+    {
+        t.env->CallStaticVoidMethod(t.classID, t.methodID, 1, currentCash);
+        t.env->CallStaticVoidMethod(t.classID, t.methodID, 4, prestige);
+    }
+#endif
+    
     classicbox = true;
     chefhat = true;
     piggybank = true;
@@ -131,45 +153,48 @@ bool GameScene::init()
     ribbonshown = true;
     facebook = true;
     twitter = true;
-    TwentyReward = true;
+    m_b_TwentyReward = true;
     kingkernel = true;
     
     bottomClickbar = Sprite::create("BottomClick_Bar.png");
     bottomClickbar->setPosition(Vec2(0, 0));
-    bottomClickbar->setAnchorPoint(Vec2(1.0 ,1.0));
+    bottomClickbar->setAnchorPoint(Vec2(1.0, 1.0));
     bottomClickbar->setScale(G_SCALEM);
-    this->addChild(bottomClickbar ,2000);
+    this->addChild(bottomClickbar, 2000);
     
     topClickbar = Sprite::create("TopClick_Bar.png");
     topClickbar->setPosition(Vec2(0, G_SHEIGHT));
     topClickbar->setAnchorPoint(Vec2(1.0, 1.0));
     topClickbar->setScale(G_SCALEM);
-    this->addChild(topClickbar ,2000);
+    this->addChild(topClickbar, 2000);
     this->topMove();
     
-    m_spt_Bucket=Sprite::create("flatpopcornbox.png");
-    m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
+    m_spt_Bucket = Sprite::create("flatpopcornbox.png");
+    m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
     m_spt_Bucket->setAnchorPoint(Vec2(0.5, 0.5));
     m_spt_Bucket->setScale(G_SCALEM);
-    this->addChild(m_spt_Bucket ,100);
+    this->addChild(m_spt_Bucket, 100);
     
-    digitSprite=Sprite::create("score_label.png");
+    digitSprite = Sprite::create("score_label.png");
     digitSprite->setScale(G_SCALEM);
     digitSprite->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT - topClickbar->getBoundingBox().size.height - digitSprite->getBoundingBox().size.height / 2 - 20 * G_SCALEM));
-    this->addChild(digitSprite ,1001);
+    this->addChild(digitSprite, 1001);
     
-    perSecondRibbon=Sprite::create("PerSecondLabel.png");
+    perSecondRibbon = Sprite::create("PerSecondLabel.png");
     perSecondRibbon->setScale(G_SCALEM);
-    perSecondRibbon->setPosition(Vec2(G_SWIDTH/2, digitSprite->getPositionY() - digitSprite->getBoundingBox().size.height - 20 * G_SCALEM));
-    this->addChild(perSecondRibbon ,999);
+    perSecondRibbon->setPosition(Vec2(G_SWIDTH / 2, digitSprite->getPositionY() - digitSprite->getBoundingBox().size.height - 20 * G_SCALEM));
+    this->addChild(perSecondRibbon, 999);
     
-    m_lbl_Score=Label::createWithTTF(StringUtils::format("%.0f Kernels",CashManager::getInstance()->getCurrentCash()),"AmericanTypewriter.ttf" ,G_SWIDTH/15);
-    m_lbl_Score->setDimensions(digitSprite->getBoundingBox().size.width, digitSprite->getBoundingBox().size.height);
+    m_ttfconf_score.fontFilePath = "AmericanTypewriter.ttf";
+    m_ttfconf_score.fontSize = G_SWIDTH / 15;
+    
+    m_lbl_Score = Label::createWithTTF(m_ttfconf_score, StringUtils::format("%s Kernels", CashManager::getInstance()->convertAmountToShortString(CashManager::getInstance()->getCurrentCash()).c_str()));
+    m_lbl_Score->setWidth(digitSprite->getBoundingBox().size.width);
     m_lbl_Score->setHorizontalAlignment(TextHAlignment::CENTER);
     m_lbl_Score->setVerticalAlignment(TextVAlignment::CENTER);
     m_lbl_Score->setColor(Color3B(1, 50, 20));
     m_lbl_Score->setPosition(Vec2(digitSprite->getPositionX(),digitSprite->getPositionY()));
-    this->addChild(m_lbl_Score ,1001);
+    this->addChild(m_lbl_Score, 1001);
     
     MenuItemImage *investButton = MenuItemImage::create("button1.png",
                                                         "button1.png",
@@ -177,6 +202,7 @@ bool GameScene::init()
                                                         {
                                                             log("Invest Button Clicked");
                                                             // Cache ChartboostReward Video.
+                                                            
                                                             this->setButtonEnable(false);
                                                             adCount++;
                                                             if (adCount >= 12 && !m_userdefault->getBoolForKey("RemoveAds", false)) {
@@ -307,7 +333,7 @@ bool GameScene::init()
                                                             // Cache ChartboostReward Video.
                                                             PluginChartboost::cache("Rewarded Video");
                                                             this->setButtonEnable(false);
-                                                            // Show Ads View                                             
+                                                            // Show Ads View
                                                             this->showBucket();
                                                             log("Bucket Button Clicked");
                                          });
@@ -323,6 +349,37 @@ bool GameScene::init()
                                                                 // Game Center Login
                                                                 // Show Leaderboard
                                                                 // SubmitScore
+                                                 float currentCash = CashManager::getInstance()->getCurrentCash();
+                                                 float cashPerSecond = CashManager::getInstance()->getCashPerSecond();
+                                                 float cashPerSwap = CashManager::getInstance()->getCashPerSwap();
+                                                 float prestige = UserDefault::getInstance()->getIntegerForKey("prestige_count");
+                                                 
+                                                 log("Game Scene : CurrentCash = %f", currentCash);
+                                                 log("Game Scene : cashPerSecond = %f", cashPerSecond);
+                                                 log("Game Scene : cashPerSwap = %f", cashPerSwap);
+                                                 log("Game Scene : Prestige = %f", prestige);
+#if CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+                                                 
+#else
+                                                 JniMethodInfo t;
+                                                 if (JniHelper::getStaticMethodInfo(t
+                                                                                   ,  "org/cocos2dx/cpp/AppActivity"
+                                                                                   ,  "showLeaderboard"
+                                                                                   ,  "()V"))
+                                                 {
+                                                     t.env->CallStaticVoidMethod(t.classID, t.methodID);
+                                                 }
+                                                 if (JniHelper::getStaticMethodInfo(t
+                                                                                   ,  "org/cocos2dx/cpp/AppActivity"
+                                                                                   ,  "reportScore"
+                                                                                   ,  "(IF)V"))
+                                                 {
+                                                     t.env->CallStaticVoidMethod(t.classID, t.methodID, 1, currentCash);
+                                                     t.env->CallStaticVoidMethod(t.classID, t.methodID, 2, cashPerSecond);
+                                                     t.env->CallStaticVoidMethod(t.classID, t.methodID, 3, cashPerSwap);
+                                                     t.env->CallStaticVoidMethod(t.classID, t.methodID, 4, prestige);
+                                                 }
+#endif
                                                                 log("GameCenter Button Clicked");
                                              });
     gamecenterButton->setPosition(Vec2(G_SWIDTH / 12, perSecondRibbon->getPositionY() - perSecondRibbon->getContentSize().height / 2 - G_SHEIGHT / 10));
@@ -360,38 +417,38 @@ bool GameScene::init()
     videobutton->setVisible(false);
     videobutton->setScale(G_SCALEM * 0.9);
     
-    m_btnmenu = Menu::create(investButton, businessButton, politicalButton, inappButton, popcornButton, bucketButton, gamecenterButton, videobutton, reviewbutton, NULL);
+    m_btnmenu = Menu::create(investButton, businessButton, politicalButton, inappButton, popcornButton, bucketButton, gamecenterButton, videobutton, /*reviewbutton,*/ NULL);
     m_btnmenu->setPosition(Vec2(0, 0));
     this->addChild(m_btnmenu, 1100);
         
-    Sprite *belowBorder=Sprite::create("bar.png");
+    Sprite *belowBorder = Sprite::create("bar.png");
     belowBorder->setAnchorPoint(Vec2(0, 0));
     belowBorder->setPosition(Vec2(0, 0));
     belowBorder->setScale(1.2f * G_SCALEM);
-    this->addChild(belowBorder ,1000);
+    this->addChild(belowBorder, 1000);
     
-    m_spt_Cover=Sprite::create("flat ribbon.png");
-    m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
+    m_spt_Cover = Sprite::create("flat ribbon.png");
+    m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
     m_spt_Cover->setScale(G_SCALEM);
-    this->addChild(m_spt_Cover ,1000);
+    this->addChild(m_spt_Cover, 1000);
     
-    m_lbl_MoneyPerSwap=Label::createWithTTF(StringUtils::format("%.0f Kernels",CashManager::getInstance()->getCashPerSwap()) ,"AmericanTypewriter.ttf" ,G_SWIDTH/15);
+    m_lbl_MoneyPerSwap=Label::createWithTTF(StringUtils::format("%.0f Kernels",CashManager::getInstance()->getCashPerSwap()), "AmericanTypewriter.ttf", G_SWIDTH / 15);
     m_lbl_MoneyPerSwap->setColor(Color3B(1, 50, 20));
-    m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
+    m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
     m_lbl_MoneyPerSwap->setDimensions(m_spt_Cover->getBoundingBox().size.width, m_spt_Cover->getBoundingBox().size.height);
     m_lbl_MoneyPerSwap->setHorizontalAlignment(TextHAlignment::CENTER);
     m_lbl_MoneyPerSwap->setVerticalAlignment(TextVAlignment::CENTER);
-    this->addChild(m_lbl_MoneyPerSwap ,1000);
+    this->addChild(m_lbl_MoneyPerSwap, 1000);
     
-    m_lbl_MoneyPerSecond=Label::createWithTTF(StringUtils::format("%.2f Kernels/Sec",CashManager::getInstance()->getCashPerSecond()) ,"AmericanTypewriter.ttf" ,G_SWIDTH/15);
+    m_lbl_MoneyPerSecond=Label::createWithTTF(StringUtils::format("%.2f Kernels/Sec",CashManager::getInstance()->getCashPerSecond()), "AmericanTypewriter.ttf", G_SWIDTH / 15);
     m_lbl_MoneyPerSecond->setColor(Color3B(255, 255, 255));
     m_lbl_MoneyPerSecond->setPosition(perSecondRibbon->getPosition());
     m_lbl_MoneyPerSecond->setDimensions(perSecondRibbon->getBoundingBox().size.width, perSecondRibbon->getBoundingBox().size.height);
     m_lbl_MoneyPerSecond->setHorizontalAlignment(TextHAlignment::CENTER);
     m_lbl_MoneyPerSecond->setVerticalAlignment(TextVAlignment::CENTER);
-    this->addChild(m_lbl_MoneyPerSecond ,1000);
+    this->addChild(m_lbl_MoneyPerSecond, 1000);
     
-    swapsCount=0;
+    swapsCount = 0;
     
     this->schedule(schedule_selector(GameScene::addPerSecond), 1.0f);
     this->schedule(schedule_selector(GameScene::rollDollar), 0.2f);
@@ -444,8 +501,8 @@ void GameScene::move() {
 
 void GameScene::checkPrestige(){
     if (m_userdefault->getIntegerForKey("prestige_count")) {
-        m_spt_PrestigeRibbon=Sprite::create("prestige ribbon");
-        m_spt_PrestigeRibbon->setPosition(Vec2(G_SWIDTH - G_SWIDTH/25, G_SHEIGHT/8));
+        m_spt_PrestigeRibbon = Sprite::create("prestige ribbon");
+        m_spt_PrestigeRibbon->setPosition(Vec2(G_SWIDTH - G_SWIDTH / 25, G_SHEIGHT / 8));
         this->addChild(m_spt_PrestigeRibbon);
     }
 }
@@ -464,8 +521,8 @@ void GameScene::checkReward(float dt){
         m_userdefault->setIntegerForKey("reviewPopup", 1);
         m_userdefault->setBoolForKey("ShowReview", false);
         
-        ReviewScene *layer = ReviewScene::create();
-        this->addChild(layer);
+//        ReviewScene *layer = ReviewScene::create();
+//        this->addChild(layer, 7000);
     }
     
     if (m_userdefault->getBoolForKey("CollectDBL") == true) {
@@ -533,161 +590,161 @@ void GameScene::checkVideo(float dt){
         }
         if (review >= 5){
             review = 0;
-            reviewbutton->setVisible(true);
+            reviewbutton->setVisible(false);
         }
 }
 void GameScene::checkUnlockables(){
     
     if (m_userdefault->getBoolForKey("classicbox") == true) {
-        this->removeChild(m_spt_Bucket);
-        m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
-        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-        m_spt_Bucket=Sprite::create("flatpopcornbox.png");
-        m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
-        this->addChild(m_spt_Bucket ,100);
+        
+        m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
+        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+        m_spt_Bucket->setTexture("flatpopcornbox.png");
+        m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
+        
         classicbox = false;
     }  else if (m_userdefault->getBoolForKey("chefhat") == true){
-        this->removeChild(m_spt_Bucket);
-        m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
-        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-        m_spt_Bucket=Sprite::create("hat.png");
-        m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/2));
-        this->addChild(m_spt_Bucket ,100);
+        
+        m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
+        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+        m_spt_Bucket->setTexture("hat.png");
+        m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
+        
         chefhat = false;
     }
     else if (m_userdefault->getBoolForKey("Upiggbank") == true){
-        this->removeChild(m_spt_Bucket);
-        m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/4));
-        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-        m_spt_Bucket=Sprite::create("goldpiggy_bank.png");
-        m_spt_Bucket->setPosition(Vec2(G_SWIDTH/1.8, G_SHEIGHT/2));
-        this->addChild(m_spt_Bucket ,100);
+        
+        m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 4));
+        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+        m_spt_Bucket->setTexture("goldpiggy_bank.png");
+        m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 1.8, G_SHEIGHT / 2));
+        
         piggybank = false;
         
     } else if (m_userdefault->getBoolForKey("moon") == true){
-        this->removeChild(m_spt_Bucket);
-        m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
-        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-        m_spt_Bucket=Sprite::create("moon.png");
-        m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/2.5));
-        this->addChild(m_spt_Bucket ,100);
+        
+        m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
+        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+        m_spt_Bucket->setTexture("moon.png");
+        m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2.5));
+        
         moon = false;
         
     } else if (m_userdefault->getBoolForKey("earth") == true){
-        this->removeChild(m_spt_Bucket);
-        m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/4));
-        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-        m_spt_Bucket=Sprite::create("earth.png");
-        m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/2));
-        this->addChild(m_spt_Bucket ,100);
+        
+        m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 4));
+        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+        m_spt_Bucket->setTexture("earth.png");
+        m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
+        
         earth = false;
         
     } else if (m_userdefault->getBoolForKey("spaceship") == true){
-        this->removeChild(m_spt_Bucket);
-        m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
-        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-        m_spt_Bucket=Sprite::create("popcornspaceship.png");
-        m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/2.5));
-        this->addChild(m_spt_Bucket ,100);
+        
+        m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
+        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+        m_spt_Bucket->setTexture("popcorn_spaceship.png");
+        m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2.5));
+        
         spaceship = false;
         
     } else if (m_userdefault->getBoolForKey("ufo") == true){
-        this->removeChild(m_spt_Bucket);
-        m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/4));
-        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-        m_spt_Bucket=Sprite::create("popcorn_ufo.png");
-        m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/2));
-        this->addChild(m_spt_Bucket ,100);
+        
+        m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 4));
+        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+        m_spt_Bucket->setTexture("popcorn_ufo.png");
+        m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
+        
         ufo = false;
         
     } else if (m_userdefault->getBoolForKey("dinnerplate") == true){
-        this->removeChild(m_spt_Bucket);
-        m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/4));
-        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-        m_spt_Bucket=Sprite::create("tray.png");
-        m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/2));
-        this->addChild(m_spt_Bucket ,100);
+        
+        m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 4));
+        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+        m_spt_Bucket->setTexture("tray.png");
+        m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
+        
         dinnerplate = false;
         
     } else if (m_userdefault->getBoolForKey("trophycup") == true){
-        this->removeChild(m_spt_Bucket);
-        m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/4));
-        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-        m_spt_Bucket=Sprite::create("popcorntrophy.png");
-        m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/2));
-        this->addChild(m_spt_Bucket ,100);
+        
+        m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 4));
+        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+        m_spt_Bucket->setTexture("popcorntrophy.png");
+        m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
+        
         trophy = false;
         
     } else if (m_userdefault->getBoolForKey("car") == true){
-        this->removeChild(m_spt_Bucket);
-        m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/4));
-        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-        m_spt_Bucket=Sprite::create("car.png");
-        m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/2));
-        this->addChild(m_spt_Bucket ,100);
+        
+        m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 4));
+        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+        m_spt_Bucket->setTexture("car.png");
+        m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
+        
         car = false;
         
     } else if (m_userdefault->getBoolForKey("umbrella") == true){
-        this->removeChild(m_spt_Bucket);
-        m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/4));
-        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-        m_spt_Bucket=Sprite::create("umbrella.png");
-        m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/1.75));
-        this->addChild(m_spt_Bucket ,100);
+        
+        m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 4));
+        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+        m_spt_Bucket->setTexture("umbrella.png");
+        m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT/1.75));
+        
         umbrella = false;
         
     } else if (m_userdefault->getBoolForKey("diamond") == true){
-        this->removeChild(m_spt_Bucket);
-        m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
-        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-        m_spt_Bucket=Sprite::create("diamond.png");
-        m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
-        this->addChild(m_spt_Bucket ,100);
+        
+        m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
+        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+        m_spt_Bucket->setTexture("diamond.png");
+        m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
+        
         diamond = false;
         
     }
     else if (m_userdefault->getBoolForKey("KingKernel") == true){
-        this->removeChild(m_spt_Bucket);
-        m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
-        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-        m_spt_Bucket=Sprite::create("King Kernel.png");
-        m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/2));
-        this->addChild(m_spt_Bucket ,100);
+        
+        m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
+        m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+        m_spt_Bucket->setTexture("King Kernel.png");
+        m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
+        
         kingkernel = false;
         
     }
+    
     if (m_userdefault->getBoolForKey("Forever20") == true) {
         m_spt_ForeverTwenty = Sprite::create("20x.png");
-        m_spt_ForeverTwenty->setPosition(Vec2(m_spt_Cover->getPositionX(), m_spt_Cover->getPositionY()));
-        m_spt_ForeverTwenty->setScaleX(0.4);
-        m_spt_ForeverTwenty->setScaleY(0.4);
-        m_spt_ForeverTwenty->setAnchorPoint(Vec2(1.2, 0.2));
-        this->addChild(m_spt_ForeverTwenty ,1000);
+        m_spt_ForeverTwenty->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width * 0.5, m_spt_Cover->getPositionY()));
+        m_spt_ForeverTwenty->setScale( 0.4 * G_SCALEM);
+        m_spt_ForeverTwenty->setAnchorPoint(Vec2(0.4, 0.4));
+        this->addChild(m_spt_ForeverTwenty, 1000);
     }
     
     if (m_userdefault->getIntegerForKey("prestige_count") > 0) {
         int prestigenumber = m_userdefault->getIntegerForKey("prestige_count");
-        m_spt_PrestigeRibbon=Sprite::create("prestige ribbon.png");
-        m_spt_PrestigeRibbon->setPosition(Vec2(G_SWIDTH*11/12, G_SHEIGHT/7));
-        this->addChild(m_spt_PrestigeRibbon ,5000);
-        m_lbl_Prestige = Label::createWithTTF(StringUtils::format("%.0d",prestigenumber) ,"AmericanTypewriter.ttf" ,G_SWIDTH/25);
+        m_spt_PrestigeRibbon = Sprite::create("prestige ribbon.png");
+        m_spt_PrestigeRibbon->setPosition(Vec2(G_SWIDTH * 11 / 12, G_SHEIGHT / 7));
+        this->addChild(m_spt_PrestigeRibbon, 5000);
+        m_lbl_Prestige = Label::createWithTTF(StringUtils::format("%.0d",prestigenumber), "AmericanTypewriter.ttf", G_SWIDTH / 25);
         m_lbl_Prestige->setPosition(Vec2(m_spt_PrestigeRibbon->getPositionX(), m_spt_PrestigeRibbon->getPositionY() + 8));
-        this->addChild(m_lbl_Prestige ,5001);
+        this->addChild(m_lbl_Prestige, 5001);
     }
+    
+    m_spt_Bucket->setScale(G_SCALEM);
 }
 void GameScene::rollDollar(float dt){
     
     if (CashManager::getInstance()->getCashPerSecond() == 0) {
         return;
     }
-    Sprite *sprite=Sprite::create("flat popcorn1.png");
+    Sprite *sprite = Sprite::create("flat popcorn1.png");
     sprite->setOpacity(196);
     sprite->setScale(G_SCALEM);
     int number=G_SWIDTH;
     sprite->setPosition(Vec2(arc4random()%number+10, G_SHEIGHT + 300 * G_SCALEY));
-    this->addChild(sprite ,0);
-//    MoveTo *moveto=MoveTo::create(1, Vec2(sprite->getPositionX(), 0));
-//    RotateBy *rot=RotateBy::create(1, arc4random()%180);
+    this->addChild(sprite, 0);
     Spawn *action = Spawn::create(MoveTo::create(1, Vec2(sprite->getPositionX(), 0)),
                                   RotateBy::create(1, arc4random() % 720),
                                   NULL);
@@ -697,13 +754,13 @@ void GameScene::rollDollar(float dt){
 void GameScene::persecondLabel(float dt){
     
     double cash = CashManager::getInstance()->getCurrentCash();
-    m_lbl_Score->setString(StringUtils::format("%s Kernels", CashManager::getInstance()->ConvertAmountToShortString(cash).c_str()));
+    m_lbl_Score->setString(StringUtils::format("%s Kernels", CashManager::getInstance()->convertAmountToShortString(cash).c_str()));
     
-    if (cash>999999999999999999) {
-       m_lbl_Score->setSystemFontSize(G_SWIDTH/25);
+    if (cash > 999999999999999999) {
+        m_ttfconf_score.fontSize = G_SWIDTH / 20;
+        m_lbl_Score->setTTFConfig(m_ttfconf_score);
     }
-    
-//    log("Kernels %f", cash);
+
     if (cash > 500000 && m_userdefault->getIntegerForKey("share_count") == 0) {
         m_userdefault->setBoolForKey("facebook", false);
         m_userdefault->setBoolForKey("twitter", false);
@@ -740,12 +797,13 @@ void GameScene::addPerSecond(float dt){
     }
     
     bucketButton->setVisible(true);
-    float cashpersec=CashManager::getInstance()->getCashPerSecond()+(CashManager::getInstance()->getCashPerSwap() * swapsCount);
+    
+    float cashpersec = CashManager::getInstance()->getCashPerSecond()+(CashManager::getInstance()->getCashPerSwap() * swapsCount);
     
     if (idle >= 1) {
         
         if (idleshown == false) {
-            m_lbl_Tutorial=Label::createWithTTF(StringUtils::format("Tap The Box To Pop Popcorn!") ,"AmericanTypewriter.ttf" ,G_SWIDTH/20);
+            m_lbl_Tutorial=Label::createWithTTF(StringUtils::format("Tap The Box To Pop Popcorn!"), "AmericanTypewriter.ttf", G_SWIDTH / 20);
             m_lbl_Tutorial->setDimensions(digitSprite->getBoundingBox().size.width, digitSprite->getBoundingBox().size.height);
             m_lbl_Tutorial->setHorizontalAlignment(TextHAlignment::CENTER);
             m_lbl_Tutorial->setVerticalAlignment(TextVAlignment::CENTER);
@@ -753,7 +811,7 @@ void GameScene::addPerSecond(float dt){
             m_lbl_Tutorial->setColor(Color3B(255, 255, 255));
             
             m_lbl_Tutorial->setPosition(Vec2(G_SWIDTH / 2,G_SHEIGHT *2/ 3.2));
-            this->addChild(m_lbl_Tutorial ,1001);
+            this->addChild(m_lbl_Tutorial, 1001);
             messageshown = true;
             
         }
@@ -764,35 +822,34 @@ void GameScene::addPerSecond(float dt){
         
     } else {
         
-        m_lbl_MoneyPerSecond->setString(StringUtils::format("%s Kernels/Sec",CashManager::getInstance()->ConvertAmountToShortString(cashpersec).c_str()));
+        m_lbl_MoneyPerSecond->setString(StringUtils::format("%s Kernels/Sec",CashManager::getInstance()->convertAmountToShortString(cashpersec).c_str()));
     }
     
-    m_lbl_MoneyPerSecond->setString(StringUtils::format("%s Kernels/Sec", CashManager::getInstance()->ConvertAmountToShortString(cashpersec).c_str()));
+    m_lbl_MoneyPerSecond->setString(StringUtils::format("%s Kernels/Sec", CashManager::getInstance()->convertAmountToShortString(cashpersec).c_str()));
     
     swapsCount=0;
-    float perswap=CashManager::getInstance()->getCashPerSwap();
-    m_lbl_MoneyPerSwap->setString(StringUtils::format("%s Kernels",CashManager::getInstance()->ConvertAmountToShortString(perswap).c_str()));
-    CashManager::getInstance()->setCurrentCash(CashManager::getInstance()->getCurrentCash() + CashManager::getInstance()->getCashPerSecond());
-    if (CashManager::getInstance()->getCurrentBucket() < CashManager::getInstance()->getBucketSize()) {
-        CashManager::getInstance()->setCurrentBucket(CashManager::getInstance()->getCurrentBucket() +(CashManager::getInstance()->getCashPerHour() / 3600));
+    CashManager *cashmanager = CashManager::getInstance();
+    float perswap = cashmanager->getCashPerSwap();
+    m_lbl_MoneyPerSwap->setString(StringUtils::format("%s Kernels", cashmanager->convertAmountToShortString(perswap).c_str()));
+    cashmanager->setCurrentCash(cashmanager->getCurrentCash() + cashmanager->getCashPerSecond());
+    if (cashmanager->getCurrentBucket() < cashmanager->getBucketSize()) {
+        cashmanager->setCurrentBucket(cashmanager->getCurrentBucket() +(cashmanager->getCashPerHour() / 3600));
     }
     else{
-        
-        CashManager::getInstance()->setCurrentBucket(CashManager::getInstance()->getBucketSize());
-        if (CashManager::getInstance()->getBucketSize()!=0 ){
-            if (!CashManager::getInstance()->getisBucketShown()){
-                CashManager::getInstance()->setisBucketShown(true);
+        cashmanager->setCurrentBucket(cashmanager->getBucketSize());
+        if (cashmanager->getBucketSize() != 0 ){
+            if (!cashmanager->getisBucketShown()){
+                cashmanager->setisBucketShown(true);
                 this->showBucket();
             }
         }
         else{
-            
             bucketButton->setVisible(false);
         }
     }
-    
 }
 void GameScene::showBucket(){
+    Director::getInstance()->getEventDispatcher()->pauseEventListenersForTarget(this);
     BucketScene *bucketLayer = BucketScene::create();
     this->addChild(bucketLayer, 7000);
 }
@@ -802,7 +859,7 @@ void GameScene::addCashPerSwap(){
     if (m_userdefault->getIntegerForKey("prestige_count") ==0) {
         if (m_userdefault->getBoolForKey("Forever20") == true) {
             swapsCount = 20;
-            CashManager::getInstance()->setCurrentCash(CashManager::getInstance()->getCurrentCash() +  20*CashManager::getInstance()->getCashPerSwap());
+            CashManager::getInstance()->setCurrentCash(CashManager::getInstance()->getCurrentCash() +  20 * CashManager::getInstance()->getCashPerSwap());
         }
         
         else {
@@ -815,15 +872,15 @@ void GameScene::addCashPerSwap(){
         
         
         if (m_userdefault->getBoolForKey("Forever20") == true) {
-            int plus=m_userdefault->getIntegerForKey("prestige_count");
-            swapsCount=21 + plus;
-            CashManager::getInstance()->setCurrentCash(CashManager::getInstance()->getCurrentCash() +  swapsCount*CashManager::getInstance()->getCashPerSwap());
+            int plus = m_userdefault->getIntegerForKey("prestige_count");
+            swapsCount = 21 + plus;
+            CashManager::getInstance()->setCurrentCash(CashManager::getInstance()->getCurrentCash() +  swapsCount * CashManager::getInstance()->getCashPerSwap());
         }
         
         else {
-            int plus=m_userdefault->getIntegerForKey("prestige_count");
+            int plus = m_userdefault->getIntegerForKey("prestige_count");
             swapsCount=1 + plus;
-            CashManager::getInstance()->setCurrentCash(CashManager::getInstance()->getCurrentCash() +  swapsCount*CashManager::getInstance()->getCashPerSwap());
+            CashManager::getInstance()->setCurrentCash(CashManager::getInstance()->getCurrentCash() +  swapsCount * CashManager::getInstance()->getCashPerSwap());
         }
         
     }
@@ -837,28 +894,28 @@ void GameScene::addSkwedSprite(){
     string popcorn_filename = StringUtils::format("popcorn%d-%d.png", group_index, popcorn_index);
     if (group_index == 0 && m_int_RDMShaker >= 1800) {
         CashManager::getInstance()->setCurrentShaker(CashManager::getInstance()->getCurrentShaker() +1);
-        Sprite *skewd=Sprite::create("clickshaker.png");
+        Sprite *skewd = Sprite::create("clickshaker.png");
         skewd->setPosition(Vec2(m_spt_Bucket->getPositionX() - m_spt_Bucket->getBoundingBox().size.width / 2 + r + m_spt_Bucket->getBoundingBox().size.width * 0.05, G_SHEIGHT / 2));
         skewd->setAnchorPoint(Vec2(0.5, 0.25));
         skewd->setScale(G_SCALEM);
-        this->addChild(skewd ,101);
+        this->addChild(skewd, 101);
         currentSkewed = skewd;
         skewdArray.pushBack(skewd);
         m_int_RDMShaker =0;
     }else
     {
-        Sprite *skewd=Sprite::create(popcorn_filename);
+        Sprite *skewd = Sprite::create(popcorn_filename);
         skewd->setPosition(Vec2(m_spt_Bucket->getPositionX() - m_spt_Bucket->getBoundingBox().size.width / 2 + r + m_spt_Bucket->getBoundingBox().size.width * 0.05, G_SHEIGHT / 2));
         skewd->setAnchorPoint(Vec2(0.5, 0.25));
         skewd->setScale(G_SCALEM);
-        this->addChild(skewd ,101);
+        this->addChild(skewd, 101);
         currentSkewed = skewd;
         skewdArray.pushBack(skewd);
     }
 }
 
 void GameScene::addBonus(){
-    KingBonus = false;
+    m_b_KingBonus = false;
     CashManager *cashmanager = CashManager::getInstance();
     if (m_int_BonusNumber <= 30) {
         cashmanager->setCurrentCash( cashmanager->getCurrentCash() + .005 * cashmanager->getCurrentCash());
@@ -880,7 +937,7 @@ void GameScene::bigPopcorn(){
     m_int_BonusNumber = CCRANDOM_0_1() * 50;
     
     m_spt_GoldenKernel = Sprite::create("goldKernel.png");
-    m_spt_GoldenKernel->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT / 2));
+    m_spt_GoldenKernel->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
     m_spt_GoldenKernel->setScale(G_SCALEM);
     if (m_int_BonusNumber <= 30) {
         m_spt_BigPopcorn = Sprite::create("bigpopcorn_0.5.png");
@@ -900,7 +957,7 @@ void GameScene::bigPopcorn(){
         m_spt_BigPopcorn = Sprite::create("bigpopcorn_10.0.png");
     }
     
-    m_spt_BigPopcorn->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT / 2));
+    m_spt_BigPopcorn->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
     m_spt_BigPopcorn->setLocalZOrder(3000);
     
     ScaleTo *hugescale=ScaleTo::create(1.5, 30);
@@ -928,14 +985,14 @@ void GameScene::bigPopcorn(){
 
 
 void GameScene::topMove(){
-    moveR=MoveTo::create(60, Vec2(G_SWIDTH, topClickbar->getPositionY()));
+    moveR=MoveTo::create(600, Vec2(G_SWIDTH, topClickbar->getPositionY()));
     moveL=MoveTo::create(20, Vec2(0, topClickbar->getPositionY()));
     
     Sequence *loop = Sequence::create(moveR,
-                                      DelayTime::create(600),
+//                                      DelayTime::create(600),
                                       CallFunc::create(CC_CALLBACK_0(GameScene::multiplier, this)),
                                       moveL,
-                                      DelayTime::create(20),
+//                                      DelayTime::create(20),
                                       CallFunc::create(CC_CALLBACK_0(GameScene::removeMultiplier, this)),
                                       NULL);
     RepeatForever *repeat = RepeatForever::create(loop);
@@ -953,22 +1010,22 @@ void GameScene::multiplier(){
     m_int_RandomMultiplier = CCRANDOM_0_1() * 50;
     
     if (m_int_RandomMultiplier <= 30) {
-        m_lbl_MultiplierLabel = Label::createWithTTF("X10" ,"AmericanTypewriter.ttf" ,G_SWIDTH / 5);
+        m_lbl_MultiplierLabel = Label::createWithTTF("X10", "AmericanTypewriter.ttf", G_SWIDTH / 5);
     }
     if (m_int_RandomMultiplier > 30 && m_int_RandomMultiplier <= 38 ){
-        m_lbl_MultiplierLabel = Label::createWithTTF("X15" ,"AmericanTypewriter.ttf" ,G_SWIDTH / 5);
+        m_lbl_MultiplierLabel = Label::createWithTTF("X15", "AmericanTypewriter.ttf", G_SWIDTH / 5);
     }
     if (m_int_RandomMultiplier > 38 && m_int_RandomMultiplier <= 46) {
-        m_lbl_MultiplierLabel = Label::createWithTTF("X20" ,"AmericanTypewriter.ttf" ,G_SWIDTH / 5);
+        m_lbl_MultiplierLabel = Label::createWithTTF("X20", "AmericanTypewriter.ttf", G_SWIDTH / 5);
     }
     if (m_int_RandomMultiplier > 46) {
-        m_lbl_MultiplierLabel = Label::createWithTTF("X30" ,"AmericanTypewriter.ttf" ,G_SWIDTH / 5);
+        m_lbl_MultiplierLabel = Label::createWithTTF("X30", "AmericanTypewriter.ttf", G_SWIDTH / 5);
     }
     
-    m_lbl_MultiplierLabel->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT/2));
+    m_lbl_MultiplierLabel->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
     m_lbl_MultiplierLabel->setColor(Color3B(1, 50, 20));
     
-    this->addChild(m_lbl_MultiplierLabel ,3000);
+    this->addChild(m_lbl_MultiplierLabel, 3000);
     
 }
 void GameScene::multiplyValue(){
@@ -1016,10 +1073,10 @@ void GameScene::tick(float dt)
                 threex = false;
                 fivex = false;
                 twentyx = false;
-                m_lbl_ClickMultiplierLabel = Label::createWithTTF("X2" ,"AmericanTypewriter.ttf" ,G_SWIDTH / 5);
-                m_lbl_ClickMultiplierLabel->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT/2));
+                m_lbl_ClickMultiplierLabel = Label::createWithTTF("X2", "AmericanTypewriter.ttf", G_SWIDTH / 5);
+                m_lbl_ClickMultiplierLabel->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
                 m_lbl_ClickMultiplierLabel->setColor(Color3B(1, 50, 20));
-                this->addChild(m_lbl_ClickMultiplierLabel ,2500);
+                this->addChild(m_lbl_ClickMultiplierLabel, 2500);
                 
             }
         }
@@ -1043,10 +1100,10 @@ void GameScene::tick(float dt)
                 threex = false;
                 fivex = false;
                 twentyx = true;
-                m_lbl_ClickMultiplierLabel = Label::createWithTTF("X20" ,"AmericanTypewriter.ttf" ,G_SWIDTH / 5);
-                m_lbl_ClickMultiplierLabel->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT/2));
+                m_lbl_ClickMultiplierLabel = Label::createWithTTF("X20", "AmericanTypewriter.ttf", G_SWIDTH / 5);
+                m_lbl_ClickMultiplierLabel->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
                 m_lbl_ClickMultiplierLabel->setColor(Color3B(1, 50, 20));
-                this->addChild(m_lbl_ClickMultiplierLabel ,2500);
+                this->addChild(m_lbl_ClickMultiplierLabel, 2500);
                 
             }
         }else
@@ -1067,10 +1124,10 @@ void GameScene::tick(float dt)
                 threex = false;
                 fivex = false;
                 twentyx = false;
-                m_lbl_ClickMultiplierLabel = Label::createWithTTF("X2" ,"AmericanTypewriter.ttf" ,G_SWIDTH / 5);
-                m_lbl_ClickMultiplierLabel->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT/2));
+                m_lbl_ClickMultiplierLabel = Label::createWithTTF("X2", "AmericanTypewriter.ttf", G_SWIDTH / 5);
+                m_lbl_ClickMultiplierLabel->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
                 m_lbl_ClickMultiplierLabel->setColor(Color3B(1, 50, 20));
-                this->addChild(m_lbl_ClickMultiplierLabel ,2500);
+                this->addChild(m_lbl_ClickMultiplierLabel, 2500);
                 
                 
             }
@@ -1081,10 +1138,10 @@ void GameScene::tick(float dt)
                 threex = true;
                 fivex = false;
                 twentyx = false;
-                m_lbl_ClickMultiplierLabel = Label::createWithTTF("X3" ,"AmericanTypewriter.ttf" ,G_SWIDTH / 5);
-                m_lbl_ClickMultiplierLabel->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT/2));
+                m_lbl_ClickMultiplierLabel = Label::createWithTTF("X3", "AmericanTypewriter.ttf", G_SWIDTH / 5);
+                m_lbl_ClickMultiplierLabel->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
                 m_lbl_ClickMultiplierLabel->setColor(Color3B(1, 50, 20));
-                this->addChild(m_lbl_ClickMultiplierLabel ,2500);
+                this->addChild(m_lbl_ClickMultiplierLabel, 2500);
                 
                 
             }
@@ -1095,10 +1152,10 @@ void GameScene::tick(float dt)
                 threex = false;
                 fivex = true;
                 twentyx = false;
-                m_lbl_ClickMultiplierLabel = Label::createWithTTF("X5" ,"AmericanTypewriter.ttf" ,G_SWIDTH / 5);
-                m_lbl_ClickMultiplierLabel->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT/2));
+                m_lbl_ClickMultiplierLabel = Label::createWithTTF("X5", "AmericanTypewriter.ttf", G_SWIDTH / 5);
+                m_lbl_ClickMultiplierLabel->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
                 m_lbl_ClickMultiplierLabel->setColor(Color3B(1, 50, 20));
-                this->addChild(m_lbl_ClickMultiplierLabel ,2500);
+                this->addChild(m_lbl_ClickMultiplierLabel, 2500);
                 
             }
         }
@@ -1110,11 +1167,11 @@ void GameScene::animateSkewdSprite(){
     int popcornFallNumb = CCRANDOM_0_1() * 3;
     
     if (m_userdefault->getBoolForKey("KingKernel") == true) {
-        ScaleTo *bigscalback=ScaleTo::create(1.5 ,1 * G_SCALEM);
+        ScaleTo *bigscalback = ScaleTo::create(1.5, 1 * G_SCALEM);
         m_spt_Bucket->runAction(bigscalback);
     } else {
-        ScaleTo *bigscalback = ScaleTo::create(0.05 ,1 * G_SCALEM);
-        ScaleBy *scalto = ScaleBy::create(0.5 ,0.85);
+        ScaleTo *bigscalback = ScaleTo::create(0.05, 1 * G_SCALEM);
+        ScaleBy *scalto = ScaleBy::create(0.5, 0.85);
         currentSkewed->runAction(scalto);
         m_spt_Bucket->runAction(bigscalback);
     }
@@ -1128,12 +1185,12 @@ void GameScene::animateSkewdSprite(){
     currentSkewed = NULL;
     
     SimpleAudioEngine::getInstance()->playEffect(StringUtils::format("popcornSound%d.mp3", popcornFallNumb % 2 + 1 ).c_str());
-    Sprite *sprite=Sprite::create(StringUtils::format("flat popcorn%d.png", popcornFallNumb + 1).c_str());
+    Sprite *sprite = Sprite::create(StringUtils::format("flat popcorn%d.png", popcornFallNumb + 1).c_str());
     sprite->setOpacity(196);
     sprite->setScale(G_SCALEM);
     int number=G_SWIDTH;
     sprite->setPosition(Vec2(arc4random() % number + 10, G_SHEIGHT));
-    this->addChild(sprite ,1);
+    this->addChild(sprite, 1);
     Spawn *action = Spawn::create(MoveTo::create(3, Vec2(sprite->getPositionX(), 0)),
                                   RotateBy::create(3, arc4random() % 720),
                                   NULL);
@@ -1172,8 +1229,8 @@ void GameScene::setBackground(float dt){
                 background2 = Sprite::create("universe.png");
                 break;
             case 5:
-                background1 = Sprite::create("jugle.png") ;
-                background2 = Sprite::create("jugleBack.png");
+                background1 = Sprite::create("jungle.png") ;
+                background2 = Sprite::create("jungleBack.png");
                 break;
             case 6:
                 background1 = Sprite::create("desert.png");
@@ -1189,6 +1246,8 @@ void GameScene::setBackground(float dt){
                 break;
         }
         
+        background1->setScale(G_SCALEM);
+        background2->setScale(G_SCALEM);
         background1->setAnchorPoint(Vec2(0, 0));
         background2->setAnchorPoint(Vec2(0, 0));
         background1->setPosition(Vec2(0, 0));
@@ -1229,17 +1288,12 @@ void GameScene::unlockables(float dt){
         if (classicbox == false) {
             return;
         } else {
-            this->removeChild(m_spt_Bucket);
+            m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
+            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+            m_spt_Bucket->setTexture("flatpopcornbox.png");
+            m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
             
-            m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
-            //            m_spt_ForeverTwenty->setPosition(Vec2(m_spt_Cover->getPositionX(), m_spt_Cover->getPositionY());
-            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-            
-            m_spt_Bucket = Sprite::create("flatpopcornbox.png");
-            m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
-            this->addChild(m_spt_Bucket ,100);
             classicbox = false;
-            
             chefhat = true;
             piggybank = true;
             moon = true;
@@ -1263,14 +1317,12 @@ void GameScene::unlockables(float dt){
             
             return;
         } else {
-            this->removeChild(m_spt_Bucket);
-            //   this->removeChild(m_spt_ForeverTwenty);
-            m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
-            //          m_spt_ForeverTwenty->setPosition(Vec2(m_spt_Cover->getPositionX(), m_spt_Cover->getPositionY());
-            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-            m_spt_Bucket=Sprite::create("hat.png");
-            m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/2));
-            this->addChild(m_spt_Bucket ,100);
+            
+            m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
+            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+            m_spt_Bucket->setTexture("hat.png");
+            m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
+            
             chefhat = false;
             classicbox = true;
             
@@ -1293,19 +1345,13 @@ void GameScene::unlockables(float dt){
         
         
         if (piggybank == false) {
-            
-            
             return;
         } else {
+            m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
+            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+            m_spt_Bucket->setTexture("goldpiggy_bank.png");
+            m_spt_Bucket->setPosition(Vec2(G_SWIDTH/1.8, G_SHEIGHT / 2));
             
-            this->removeChild(m_spt_Bucket);
-            //   m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/4));
-            m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
-            //            m_spt_ForeverTwenty->setPosition(Vec2(m_spt_Cover->getPositionX(), m_spt_Cover->getPositionY());
-            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-            m_spt_Bucket=Sprite::create("goldpiggy_bank.png");
-            m_spt_Bucket->setPosition(Vec2(G_SWIDTH/1.8, G_SHEIGHT/2));
-            this->addChild(m_spt_Bucket ,100);
             piggybank = false;
             classicbox = true;
             
@@ -1332,13 +1378,13 @@ void GameScene::unlockables(float dt){
             return;
         } else {
             
-            this->removeChild(m_spt_Bucket);
-            m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
             
-            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-            m_spt_Bucket=Sprite::create("moon.png");
-            m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/2.5));
-            this->addChild(m_spt_Bucket ,100);
+            m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
+            
+            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+            m_spt_Bucket->setTexture("moon.png");
+            m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2.5));
+            
             moon = false;
             classicbox = true;
             
@@ -1364,13 +1410,11 @@ void GameScene::unlockables(float dt){
             return;
         } else {
             
-            this->removeChild(m_spt_Bucket);
-            m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/4));
-            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-            //          m_spt_ForeverTwenty->setPosition(Vec2(m_spt_Cover->getPositionX(), m_spt_Cover->getPositionY());
-            m_spt_Bucket=Sprite::create("earth.png");
-            m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/2));
-            this->addChild(m_spt_Bucket ,100);
+            m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 4));
+            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+            m_spt_Bucket->setTexture("earth.png");
+            m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
+            
             earth = false;
             classicbox = true;
             
@@ -1395,13 +1439,13 @@ void GameScene::unlockables(float dt){
             return;
         } else {
             
-            this->removeChild(m_spt_Bucket);
-            m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
             
-            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-            m_spt_Bucket=Sprite::create("popcornspaceship.png");
-            m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/2.5));
-            this->addChild(m_spt_Bucket ,100);
+            m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
+            
+            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+            m_spt_Bucket->setTexture("popcorn_spaceship.png");
+            m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2.5));
+            
             spaceship = false;
             classicbox = true;
             
@@ -1425,14 +1469,11 @@ void GameScene::unlockables(float dt){
             return;
         } else {
             
-            this->removeChild(m_spt_Bucket);
-            m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/4));
-            //          m_spt_ForeverTwenty->setPosition(Vec2(m_spt_Cover->getPositionX(), m_spt_Cover->getPositionY());
-            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-            m_spt_Bucket=Sprite::create("popcorn_ufo.png");
-            m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/2));
-            this->addChild(m_spt_Bucket ,100);
-            //      this->addChild(m_spt_ForeverTwenty);
+            m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 4));
+            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+            m_spt_Bucket->setTexture("popcorn_ufo.png");
+            m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
+            
             ufo = false;
             classicbox = true;
             
@@ -1456,13 +1497,11 @@ void GameScene::unlockables(float dt){
             return;
         } else {
             
-            this->removeChild(m_spt_Bucket);
-            m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/4));
-            //         m_spt_ForeverTwenty->setPosition(Vec2(m_spt_Cover->getPositionX(), m_spt_Cover->getPositionY());
-            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-            m_spt_Bucket=Sprite::create("tray.png");
-            m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/2));
-            this->addChild(m_spt_Bucket ,100);
+            m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 4));
+            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+            m_spt_Bucket->setTexture("tray.png");
+            m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
+            
             dinnerplate = false;
             classicbox = true;
             
@@ -1485,14 +1524,14 @@ void GameScene::unlockables(float dt){
         if (trophy == false) {
             return;
         } else {
-            this->removeChild(m_spt_Bucket);
-            m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/4));
-            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
             
-            m_spt_Bucket=Sprite::create("popcorntrophy.png");
+            m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 4));
+            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
             
-            m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/2));
-            this->addChild(m_spt_Bucket ,100);
+            m_spt_Bucket->setTexture("popcorntrophy.png");
+            
+            m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
+            
             trophy = false;
             classicbox = true;
             
@@ -1516,12 +1555,11 @@ void GameScene::unlockables(float dt){
             return;
         } else {
             
-            this->removeChild(m_spt_Bucket);
-            m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/4));
-            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-            m_spt_Bucket=Sprite::create("car.png");
-            m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/2));
-            this->addChild(m_spt_Bucket ,100);
+            m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 4));
+            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+            m_spt_Bucket->setTexture("car.png");
+            m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
+            
             car = false;
             classicbox = true;
             
@@ -1544,12 +1582,12 @@ void GameScene::unlockables(float dt){
         if (umbrella == false) {
             return;
         } else {
-            this->removeChild(m_spt_Bucket);
-            m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/4));
-            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-            m_spt_Bucket=Sprite::create("umbrella.png");
-            m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/1.75));
-            this->addChild(m_spt_Bucket ,100);
+            
+            m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 4));
+            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+            m_spt_Bucket->setTexture("umbrella.png");
+            m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT/1.75));
+            
             umbrella = false;
             classicbox = true;
             
@@ -1572,13 +1610,13 @@ void GameScene::unlockables(float dt){
         if (diamond == false) {
             return;
         } else {
-            this->removeChild(m_spt_Bucket);
-            m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
             
-            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-            m_spt_Bucket=Sprite::create("diamond.png");
-            m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
-            this->addChild(m_spt_Bucket ,100);
+            m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
+            
+            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+            m_spt_Bucket->setTexture("diamond.png");
+            m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
+            
             diamond = false;
             classicbox = true;
             
@@ -1603,13 +1641,13 @@ void GameScene::unlockables(float dt){
             return;
         } else {
             
-            this->removeChild(m_spt_Bucket);
-            m_spt_Cover->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
             
-            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width/10, m_spt_Cover->getPositionY()));
-            m_spt_Bucket=Sprite::create("King Kernel.png");
-            m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/2));
-            this->addChild(m_spt_Bucket ,100);
+            m_spt_Cover->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
+            
+            m_lbl_MoneyPerSwap->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width / 10, m_spt_Cover->getPositionY()));
+            m_spt_Bucket->setTexture("King Kernel.png");
+            m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 2));
+            
             kingkernel = false;
             classicbox = true;
             diamond = true;
@@ -1631,18 +1669,16 @@ void GameScene::unlockables(float dt){
     
     if (m_userdefault->getBoolForKey("Forever20") == true) {
         
-        if (TwentyReward == false) {
+        if (m_b_TwentyReward == false) {
             return;
         } else
             this->removeChild(m_spt_ForeverTwenty);
         
-        
         m_spt_ForeverTwenty = Sprite::create("20x.png");
-        m_spt_ForeverTwenty->setPosition(Vec2(m_spt_Cover->getPositionX(), m_spt_Cover->getPositionY()));
-        m_spt_ForeverTwenty->setScaleX(0.4);
-        m_spt_ForeverTwenty->setScaleY(0.4);
-        m_spt_ForeverTwenty->setAnchorPoint(Vec2(1.2, 0.2));
-        this->addChild(m_spt_ForeverTwenty ,1000);
+        m_spt_ForeverTwenty->setPosition(Vec2(m_spt_Cover->getPositionX() - m_spt_Cover->getBoundingBox().size.width * 0.5, m_spt_Cover->getPositionY()));
+        m_spt_ForeverTwenty->setScale( 0.4 * G_SCALEM);
+        m_spt_ForeverTwenty->setAnchorPoint(Vec2(0.4, 0.4));
+        this->addChild(m_spt_ForeverTwenty, 1000);
     }
     
     
@@ -1651,24 +1687,23 @@ void GameScene::unlockables(float dt){
         
         
         if (m_userdefault->getBoolForKey("RibbonShown") == false) {
-            
-            
             return;
         } else {
             
             int prestigenumber = m_userdefault->getIntegerForKey("prestige_count");
-            this->removeChild(m_spt_Bucket);
-            m_spt_PrestigeRibbon=Sprite::create("prestige ribbon.png");
-            m_spt_PrestigeRibbon->setPosition(Vec2(G_SWIDTH * 11 / 12, G_SHEIGHT/7));
-            m_spt_Bucket=Sprite::create("flatpopcornbox.png");
-            m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
             
-            m_lbl_Score->setSystemFontSize(G_SWIDTH / 15);
+            m_spt_PrestigeRibbon = Sprite::create("prestige ribbon.png");
+            m_spt_PrestigeRibbon->setPosition(Vec2(G_SWIDTH * 11 / 12, G_SHEIGHT/7));
+            m_spt_Bucket->setTexture("flatpopcornbox.png");
+            m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
+            
+            m_ttfconf_score.fontSize = G_SWIDTH / 15;
+            m_lbl_Score->setTTFConfig(m_ttfconf_score);
             this->addChild(m_spt_PrestigeRibbon, 5000);
-            m_lbl_Prestige = Label::createWithTTF(StringUtils::format("%.0d",prestigenumber), "AmericanTypewriter.ttf" ,G_SWIDTH/25);
+            m_lbl_Prestige = Label::createWithTTF(StringUtils::format("%.0d",prestigenumber), "AmericanTypewriter.ttf", G_SWIDTH / 25);
             m_lbl_Prestige->setPosition(Vec2(m_spt_PrestigeRibbon->getPositionX(), m_spt_PrestigeRibbon->getPositionY() + 8));
-            this->addChild(m_lbl_Prestige ,5001);
-            this->addChild(m_spt_Bucket ,100);
+            this->addChild(m_lbl_Prestige, 5001);
+            
             m_userdefault->setBoolForKey("RibbonShown", false);
         }
     }
@@ -1676,25 +1711,25 @@ void GameScene::unlockables(float dt){
     
     else {
         if (m_userdefault->getBoolForKey("RibbonShown") == false) {
-            
-            
             return;
         } else {
             
             int prestigenumber = m_userdefault->getIntegerForKey("prestige_count");
-            this->removeChild(m_spt_Bucket);
-            this->removeChild(m_lbl_Prestige);
-            m_spt_PrestigeRibbon=Sprite::create("prestige ribbon.png");
-            m_spt_PrestigeRibbon->setPosition(Vec2(G_SWIDTH*11/12, G_SHEIGHT/7));
-            m_spt_Bucket=Sprite::create("flatpopcornbox.png");
-            m_spt_Bucket->setPosition(Vec2(G_SWIDTH/2, G_SHEIGHT/3));
             
-            m_lbl_Score->setSystemFontSize(G_SWIDTH / 15);
-            this->addChild(m_spt_PrestigeRibbon ,5000);
-            m_lbl_Prestige = Label::createWithTTF(StringUtils::format("%.0d",prestigenumber) ,"AmericanTypewriter.ttf" ,G_SWIDTH/25);
+            this->removeChild(m_lbl_Prestige);
+            m_spt_PrestigeRibbon = Sprite::create("prestige ribbon.png");
+            m_spt_PrestigeRibbon->setPosition(Vec2(G_SWIDTH*11/12, G_SHEIGHT/7));
+            m_spt_Bucket->setTexture("flatpopcornbox.png");
+            m_spt_Bucket->setPosition(Vec2(G_SWIDTH / 2, G_SHEIGHT / 3));
+            
+            m_ttfconf_score.fontSize = G_SWIDTH / 15;
+            m_lbl_Score->setTTFConfig(m_ttfconf_score);
+            
+            this->addChild(m_spt_PrestigeRibbon, 5000);
+            m_lbl_Prestige = Label::createWithTTF(StringUtils::format("%.0d",prestigenumber), "AmericanTypewriter.ttf", G_SWIDTH / 25);
             m_lbl_Prestige->setPosition(Vec2(m_spt_PrestigeRibbon->getPositionX(), m_spt_PrestigeRibbon->getPositionY() + 8));
-            this->addChild(m_lbl_Prestige ,5001);
-            this->addChild(m_spt_Bucket ,100);
+            this->addChild(m_lbl_Prestige, 5001);
+            
             m_userdefault->setBoolForKey("RibbonShown", false);
         }
         
@@ -1732,14 +1767,33 @@ void GameScene::onTouchesBegan(const std::vector<Touch*>& touches, Event *pEvent
     if (m_spt_Bucket->getBoundingBox().containsPoint(touchLocation)) {
         
         if (barwidth == 1000) {
+            
+            int currentCash = (int)CashManager::getInstance()->getCurrentCash();
+            int cashPerSecond = (int)CashManager::getInstance()->getCashPerSecond();
+            int cashPerSwap = (int)CashManager::getInstance()->getCashPerSwap();
+            int prestige = UserDefault::getInstance()->getIntegerForKey("prestige_count");
+#if CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+            
+#else
+            JniMethodInfo t;
+            if (JniHelper::getStaticMethodInfo(t
+                                              ,  "org/cocos2dx/cpp/AppActivity"
+                                              ,  "reportScore"
+                                              ,  "(IF)V"))
+            {
+                t.env->CallStaticVoidMethod(t.classID, t.methodID, 1, currentCash);
+                t.env->CallStaticVoidMethod(t.classID, t.methodID, 2, cashPerSecond);
+                t.env->CallStaticVoidMethod(t.classID, t.methodID, 3, cashPerSwap);
+                t.env->CallStaticVoidMethod(t.classID, t.methodID, 4, prestige);
+            }
+#endif
             review++;
             log("= %i", review);
             SimpleAudioEngine::getInstance()->playEffect("jingleSound.mp3");
-            barwidth=0;
+            barwidth = 0;
             this->bigPopcorn();
         }
         if (m_userdefault->getBoolForKey("Treadmill") == true) {
-            
             this->move();
         }
         idle = 0;
@@ -1754,29 +1808,28 @@ void GameScene::onTouchesBegan(const std::vector<Touch*>& touches, Event *pEvent
         m_int_RDMShaker++;
         
         barwidth++;
-//        barwidth += 100;
         
         bottomClickbar->setPosition(Vec2(barwidth * G_SWIDTH / 1000, perSecondRibbon->getPositionY() - perSecondRibbon->getBoundingBox().size.height / 2 - 20 * G_SCALEM));
         
         this->addSkwedSprite();
         
-        if (m_spt_Bucket->getScale() > 4) {
+        if (m_spt_Bucket->getScale() > 4 * G_SCALEM) {
             this->bigPopcorn();
-            ScaleTo *bigscalback=ScaleTo::create(0.01 ,1);
+            ScaleTo *bigscalback = ScaleTo::create(0.01, G_SCALEM);
             m_spt_Bucket->runAction(bigscalback);
-            KingBonus = true;
+            m_b_KingBonus = true;
         } else if (m_userdefault->getBoolForKey("KingKernel") == true) {
-            if (KingBonus == false) {
-                ScaleTo *bigscalto=ScaleTo::create(0.05, m_spt_Bucket->getScale() * 1.03 * G_SCALEM);
+            if (m_b_KingBonus == false) {
+                ScaleBy *bigscalto = ScaleBy::create(0.05, 1.03);
                 m_spt_Bucket->runAction(bigscalto);
             }
         }
         else {
-            ScaleTo *bigscalto=ScaleTo::create(0.05 ,0.95 * m_spt_Bucket->getScale());
+            ScaleTo *bigscalto=ScaleTo::create(0.05, 0.95 * G_SCALEM);
             m_spt_Bucket->runAction(bigscalto);
         }
         if (m_bool_Lmoving == true) {
-            m_int_ClickMultiplier=0;
+            m_int_ClickMultiplier = 0;
             this->removeChild(m_lbl_ClickMultiplierLabel);
             this->multiplyValue();
         }
@@ -1787,15 +1840,15 @@ void GameScene::onTouchesBegan(const std::vector<Touch*>& touches, Event *pEvent
             CashManager::getInstance()->setCurrentCash(CashManager::getInstance()->getCurrentCash() +  2*CashManager::getInstance()->getCashPerSwap());
         }
         if (threex == true) {
-            swapsCount+=2;
+            swapsCount += 2;
             CashManager::getInstance()->setCurrentCash(CashManager::getInstance()->getCurrentCash() +  2*CashManager::getInstance()->getCashPerSwap());
         }
         if (fivex == true) {
-            swapsCount +=5;
+            swapsCount += 5;
             CashManager::getInstance()->setCurrentCash(CashManager::getInstance()->getCurrentCash() +  5*CashManager::getInstance()->getCashPerSwap());
         }
         if (twentyx == true) {
-            swapsCount +=20;
+            swapsCount += 20;
             CashManager::getInstance()->setCurrentCash(CashManager::getInstance()->getCurrentCash() +  20*CashManager::getInstance()->getCashPerSwap());
         }
     }

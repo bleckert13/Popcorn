@@ -2,7 +2,7 @@
 //  GameScene.hpp
 //  Popcorn
 //
-//  Created by Monkey on 7/27/16.
+//  Created by Hans on 7/27/16.
 //
 //
 
@@ -77,6 +77,8 @@ private:
     
     Label *m_lbl_Tutorial;
     
+    TTFConfig m_ttfconf_score;
+    
     
     Point startPoint;
     Point endPoint;
@@ -113,9 +115,9 @@ private:
     bool prestiged;
     bool facebook;
     bool twitter;
-    bool VideoBonus;
-    bool TwentyReward;
-    bool KingBonus;
+    bool m_b_VideoBonus;
+    bool m_b_TwentyReward;
+    bool m_b_KingBonus;
     int idle;
     bool doublethirty;
     int  doublethirtytime;

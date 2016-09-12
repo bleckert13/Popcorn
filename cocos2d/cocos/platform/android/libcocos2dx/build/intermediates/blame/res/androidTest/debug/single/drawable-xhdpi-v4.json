@@ -1,15 +1,15 @@
 [
     {
-        "merged": "/Volumes/Work/Popcorn/work/Git/Popcorn/cocos2d/cocos/platform/android/libcocos2dx/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/common_google_signin_btn_text_dark_normal.9.png",
-        "source": "/Volumes/Work/Popcorn/work/Git/Popcorn/cocos2d/cocos/platform/android/libcocos2dx/build/intermediates/exploded-aar/proj.android-studio/gps/unspecified/res/drawable-xhdpi-v4/common_google_signin_btn_text_dark_normal.9.png"
+        "merged": "/Volumes/Work/Popcorn/work/Git/Popcorn/cocos2d/cocos/platform/android/libcocos2dx/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/common_google_signin_btn_text_dark_disabled.9.png",
+        "source": "/Volumes/Work/Popcorn/work/Git/Popcorn/cocos2d/cocos/platform/android/libcocos2dx/build/intermediates/exploded-aar/proj.android-studio/gps/unspecified/res/drawable-xhdpi-v4/common_google_signin_btn_text_dark_disabled.9.png"
     },
     {
         "merged": "/Volumes/Work/Popcorn/work/Git/Popcorn/cocos2d/cocos/platform/android/libcocos2dx/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/cast_ic_notification_1.png",
         "source": "/Volumes/Work/Popcorn/work/Git/Popcorn/cocos2d/cocos/platform/android/libcocos2dx/build/intermediates/exploded-aar/proj.android-studio/gps/unspecified/res/drawable-xhdpi-v4/cast_ic_notification_1.png"
     },
     {
-        "merged": "/Volumes/Work/Popcorn/work/Git/Popcorn/cocos2d/cocos/platform/android/libcocos2dx/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/common_google_signin_btn_text_dark_disabled.9.png",
-        "source": "/Volumes/Work/Popcorn/work/Git/Popcorn/cocos2d/cocos/platform/android/libcocos2dx/build/intermediates/exploded-aar/proj.android-studio/gps/unspecified/res/drawable-xhdpi-v4/common_google_signin_btn_text_dark_disabled.9.png"
+        "merged": "/Volumes/Work/Popcorn/work/Git/Popcorn/cocos2d/cocos/platform/android/libcocos2dx/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/common_google_signin_btn_text_dark_normal.9.png",
+        "source": "/Volumes/Work/Popcorn/work/Git/Popcorn/cocos2d/cocos/platform/android/libcocos2dx/build/intermediates/exploded-aar/proj.android-studio/gps/unspecified/res/drawable-xhdpi-v4/common_google_signin_btn_text_dark_normal.9.png"
     },
     {
         "merged": "/Volumes/Work/Popcorn/work/Git/Popcorn/cocos2d/cocos/platform/android/libcocos2dx/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/common_plus_signin_btn_text_dark_normal.9.png",

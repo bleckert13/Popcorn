@@ -30,20 +30,43 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
+
+import com.eckert.kernelking.R;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.games.Games;
+import com.google.android.gms.games.leaderboard.Leaderboards;
+import com.google.example.games.basegameutils.BaseGameUtils;
 
 import org.cocos2dx.lib.Cocos2dxActivity;
 
 import java.util.List;
 
-public class AppActivity extends Cocos2dxActivity {
+public class AppActivity extends Cocos2dxActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
     private static AppActivity me = null;
+
+    public static final String TAG = "cocos2d-x debug info";
+    private static int RC_SIGN_IN = 9001;
+    private static int REQUEST_LEADERBOARD = 1000;
+    private boolean mResolvingConnectionFailure = false;
+    private boolean mAutoStartSignInflow = true;
+    private boolean mSignInClicked = false;
+    public GoogleApiClient mGoogleApiClient;
 
     private final static String APP_PNAME = "com.eckert.kernelking";// Package Name
     protected void onCreate(Bundle savedInstanceState){
         me = this;
         super.onCreate(savedInstanceState);
-
+        // Create the Google Api Client with access to the Play Games services
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(Games.API).addScope(Games.SCOPE_GAMES)
+                // add other APIs and scopes here as needed
+                .build();
     }
 
     public static void openAppRate(String url) {
@@ -135,6 +158,108 @@ public class AppActivity extends Cocos2dxActivity {
                     Toast.makeText(me, "Twitter Share Failed.", Toast.LENGTH_SHORT);
                 }
             });
+        }
+    }
+
+    public static void reportScore(int index, float score)
+    {
+        if (me.mGoogleApiClient != null && me.mGoogleApiClient.isConnected()) {
+            Log.d(TAG,  String.format("--------- Report Player Score : %f --------", score));
+            switch (index)
+            {
+                case 1:
+                    Games.Leaderboards.submitScoreImmediate(me.mGoogleApiClient, me.getString(R.string.leaderboard_id_kernel), (long)(score * 100)).setResultCallback(new MyLeaderBoardSubmitScoreCallback());
+                    break;
+                case 2:
+                    Games.Leaderboards.submitScoreImmediate(me.mGoogleApiClient, me.getString(R.string.leaderboard_id_second), (long)(score * 100)).setResultCallback(new MyLeaderBoardSubmitScoreCallback());
+                    break;
+                case 3:
+                    Games.Leaderboards.submitScoreImmediate(me.mGoogleApiClient, me.getString(R.string.leaderboard_id_click), (long)(score * 100)).setResultCallback(new MyLeaderBoardSubmitScoreCallback());
+                    break;
+                case 4:
+                    Games.Leaderboards.submitScoreImmediate(me.mGoogleApiClient, me.getString(R.string.leaderboard_id_level), (long)score).setResultCallback(new MyLeaderBoardSubmitScoreCallback());
+                    break;
+                default:
+                    break;
+            }
+            Log.d(TAG, "--------- Sent Player Score --------");
+        }
+    }
+
+    public static void showLeaderboard()
+    {
+        if (me.mGoogleApiClient != null && me.mGoogleApiClient.isConnected()) {
+            Log.d(TAG, "--------- Show Leaderboard --------");
+            me.startActivityForResult(Games.Leaderboards.getAllLeaderboardsIntent(me.mGoogleApiClient), REQUEST_LEADERBOARD);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+        Log.d(TAG,"---------- Google Play Game Connecting -----------");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mGoogleApiClient.disconnect();
+        Log.d(TAG,"---------- Google Play Game Stop -----------");
+    }
+
+    @Override
+    public void onConnected(Bundle arg0) {
+        // TODO Auto-generated method stub
+        Log.d(TAG,"---------- Google Play Game Connected -----------");
+    }
+
+    @Override
+    public void onConnectionSuspended(int arg0) {
+        // TODO Auto-generated method stub
+        // Attempt to reconnect
+        mGoogleApiClient.connect();
+        Log.d(TAG,"---------- Google Play Game ConnectionSuspended -----------");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        // TODO Auto-generated method stub
+        Log.d(TAG,"---------- Google Play Game ConnectionFailed -----------");
+        if (mResolvingConnectionFailure) {
+            // Already resolving
+            return;
+        }
+
+        // If the sign in button was clicked or if auto sign-in is enabled,
+        // launch the sign-in flow
+        if (mSignInClicked || mAutoStartSignInflow) {
+            mAutoStartSignInflow = false;
+            mSignInClicked = false;
+            mResolvingConnectionFailure = true;
+
+            // Attempt to resolve the connection failure using BaseGameUtils.
+            // The R.string.signin_other_error value should reference a generic
+            // error string in your strings.xml file, such as "There was
+            // an issue with sign in, please try again later."
+            if (!BaseGameUtils.resolveConnectionFailure(this, mGoogleApiClient, connectionResult, RC_SIGN_IN, getString(R.string.signin_other_error))) {
+                mResolvingConnectionFailure = false;
+            }
+        }
+
+        // Put code here to display the sign-in button
+    }
+}
+
+class MyLeaderBoardSubmitScoreCallback implements ResultCallback<Leaderboards.SubmitScoreResult> {
+    @Override
+    public void onResult(Leaderboards.SubmitScoreResult res) {
+        int code = res.getStatus().getStatusCode();
+        Log.d("cocos2d-x debug info", "--------- Submit Score Status  --------" + Integer.toString(code) + "-------");
+        if (res.getStatus().getStatusCode() == 0) {
+            // data sent successfully to server.
+            // display toast.
+            Log.d("cocos2d-x debug info", "--------- Reported Player Score --------");
         }
     }
 }

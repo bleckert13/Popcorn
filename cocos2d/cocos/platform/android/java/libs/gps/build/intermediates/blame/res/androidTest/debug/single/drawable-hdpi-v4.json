@@ -4,12 +4,12 @@
         "source": "/Volumes/Work/Popcorn/work/Git/Popcorn/cocos2d/cocos/platform/android/java/libs/gps/build/intermediates/bundles/debug/res/drawable-hdpi-v4/common_plus_signin_btn_text_light_disabled.9.png"
     },
     {
-        "merged": "/Volumes/Work/Popcorn/work/Git/Popcorn/cocos2d/cocos/platform/android/java/libs/gps/build/intermediates/res/merged/androidTest/debug/drawable-hdpi-v4/common_google_signin_btn_icon_dark_pressed.9.png",
-        "source": "/Volumes/Work/Popcorn/work/Git/Popcorn/cocos2d/cocos/platform/android/java/libs/gps/build/intermediates/bundles/debug/res/drawable-hdpi-v4/common_google_signin_btn_icon_dark_pressed.9.png"
-    },
-    {
         "merged": "/Volumes/Work/Popcorn/work/Git/Popcorn/cocos2d/cocos/platform/android/java/libs/gps/build/intermediates/res/merged/androidTest/debug/drawable-hdpi-v4/common_plus_signin_btn_icon_light_disabled.9.png",
         "source": "/Volumes/Work/Popcorn/work/Git/Popcorn/cocos2d/cocos/platform/android/java/libs/gps/build/intermediates/bundles/debug/res/drawable-hdpi-v4/common_plus_signin_btn_icon_light_disabled.9.png"
+    },
+    {
+        "merged": "/Volumes/Work/Popcorn/work/Git/Popcorn/cocos2d/cocos/platform/android/java/libs/gps/build/intermediates/res/merged/androidTest/debug/drawable-hdpi-v4/common_google_signin_btn_icon_dark_pressed.9.png",
+        "source": "/Volumes/Work/Popcorn/work/Git/Popcorn/cocos2d/cocos/platform/android/java/libs/gps/build/intermediates/bundles/debug/res/drawable-hdpi-v4/common_google_signin_btn_icon_dark_pressed.9.png"
     },
     {
         "merged": "/Volumes/Work/Popcorn/work/Git/Popcorn/cocos2d/cocos/platform/android/java/libs/gps/build/intermediates/res/merged/androidTest/debug/drawable-hdpi-v4/ic_plusone_tall_off_client.png",

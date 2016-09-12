@@ -2,7 +2,7 @@
 //  InvestmentLayer.cpp
 //  Popcorn
 //
-//  Created by Monkey on 7/28/16.
+//  Created by Hans on 7/28/16.
 //
 //
 
@@ -256,7 +256,7 @@ TableViewCell* InvestmentLayer::tableCellAtIndex(cocos2d::extension::TableView *
     lbl_count->setAnchorPoint(Vec2(0, 0.5));
     cell->addChild(lbl_count);
     
-    Label *lbl_price = Label::createWithTTF(StringUtils::format("%s Kernels", CashManager::getInstance()->ConvertAmountToShortString(price).c_str()),
+    Label *lbl_price = Label::createWithTTF(StringUtils::format("%s Kernels", CashManager::getInstance()->convertAmountToShortString(price).c_str()),
                                             "AmericanTypewriter.ttf",
                                             G_SWIDTH / 25);
     lbl_price->setWidth(spt_ribb_l->getBoundingBox().size.width * 0.8);
@@ -309,21 +309,23 @@ void InvestmentLayer::tableCellTouched(cocos2d::extension::TableView *table, coc
     float count = userdefault->getIntegerForKey(list_countkey[index].c_str());
     float currentShaker = cashmanager->getCurrentShaker();
     
-    if (count < 3) {
-        if (currentCash < price) {
-            MessageBox("Not Enough Kernels", "");
-            return;
-        }else
-        {
-            cashmanager->setCurrentCash(currentCash - price);
-            userdefault->setFloatForKey(list_pricekey[cell->getIdx()].c_str(), price * 1.4);
-            if (count == 0) {
-                cashmanager->setCurrentShaker(currentShaker + 1);
-            }
+    if (currentCash < price) {
+        MessageBox("Not Enough Kernels", "");
+        return;
+    }else
+    {
+        cashmanager->setCurrentCash(currentCash - price);
+        userdefault->setFloatForKey(list_pricekey[cell->getIdx()].c_str(), price * 1.4);
+        if (count == 0) {
+            cashmanager->setCurrentShaker(currentShaker + 1);
         }
-        userdefault->setIntegerForKey(list_countkey[cell->getIdx()].c_str(), count + 1);
     }
+    cashmanager->updateMoneyPerSecond((int)cell->getIdx());
+    userdefault->setIntegerForKey(list_countkey[cell->getIdx()].c_str(), count + 1);
     
     cashmanager->reloadCashPerSecondAndCashPerSwap();
+    
+    Vec2 offset = table->getContentOffset();
     table->reloadData();
+    table->setContentOffset(offset);
 }

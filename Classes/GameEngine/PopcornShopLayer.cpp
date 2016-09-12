@@ -2,7 +2,7 @@
 //  PopcornShopLayer.cpp
 //  Popcorn
 //
-//  Created by Monkey on 8/3/16.
+//  Created by Hans on 8/3/16.
 //
 //
 
@@ -38,8 +38,6 @@ bool PopcornShopLayer::init()
     CashManager *cashmanager = CashManager::getInstance();
     
     IAP::setListener(this);
-//    IAP::setDebug(true);
-//    IAP::refresh();
     
     list_name.push_back("Shaker of Salt");
     list_name.push_back("Salt Mine");
@@ -93,7 +91,7 @@ bool PopcornShopLayer::init()
     for (int i = 1; i < 28; i++) {
         price_key = StringUtils::format("p%d_price", i);
         price = userdefault->getFloatForKey(price_key.c_str());
-        list_price.push_back(cashmanager->ConvertAmountToShortString(price));
+        list_price.push_back(cashmanager->convertAmountToShortString(price));
     }
     
     return true;
@@ -177,10 +175,6 @@ TableViewCell* PopcornShopLayer::tableCellAtIndex(cocos2d::extension::TableView 
     TableViewCell* cell = table->dequeueCell();
     cell = new TableViewCell();
     cell->autorelease();
-    
-    UserDefault *userdefault = UserDefault::getInstance();
-    CashManager *cashmananger =  CashManager::getInstance();
-    float cash = cashmananger->getCurrentCash();
     
     auto background_color = Color3B(242, 42, 73);
     auto bg = Sprite::create();
@@ -276,19 +270,22 @@ void PopcornShopLayer::tableCellTouched(cocos2d::extension::TableView *table, co
     UserDefault *userdefault = UserDefault::getInstance();
     CashManager *cashmanager = CashManager::getInstance();
     
+    sdkbox::Product p;
+    
     int index = (int)cell->getIdx();
     if (index == 0) {
         // In-App Purchase
+        IAP::purchase("Shaker of Salt");
     }else if (index == 1)
     {
         // In-App Purchase
+        IAP::purchase("Salt Mine");
     }else if (index == 2)
     {
         userdefault->setIntegerForKey("CustomPopcorn", 0);
     }else
-    {
-        
-        if (!userdefault->getBoolForKey(StringUtils::format("p%d", index - 2).c_str()) && index > 3) {
+    {        
+        if (!userdefault->getBoolForKey(StringUtils::format("p%d", index - 3).c_str()) && index > 3) {
             MessageBox("Purchase the previous upgrade to purchase this one.", "");
             return;
         }
@@ -307,9 +304,14 @@ void PopcornShopLayer::tableCellTouched(cocos2d::extension::TableView *table, co
             userdefault->setIntegerForKey("CustomPopcorn", index - 2);
             m_lbl_shaker->setString(StringUtils::format("%d", (int)currentShaker));
             userdefault->setBoolForKey(StringUtils::format("p%d", index - 2).c_str(), true);
+            list_price[index] = cashmanager->convertAmountToShortString(0);
         }
     }
     cashmanager->reloadCashPerSecondAndCashPerSwap();
+    
+    Vec2 offset = table->getContentOffset();
+    table->reloadData();
+    table->setContentOffset(offset);
 }
 
 void PopcornShopLayer::onInitialized(bool ok)
@@ -335,6 +337,9 @@ void PopcornShopLayer::onSuccess(sdkbox::Product const& p)
         currentshaker = cashmanager->getCurrentShaker();
         m_lbl_shaker->setString(StringUtils::format("%d", (int)currentshaker));
     }
+    Vec2 offset = m_tableview->getContentOffset();
+    m_tableview->reloadData();
+    m_tableview->setContentOffset(offset);    
 }
 
 void PopcornShopLayer::onFailure(sdkbox::Product const& p, const std::string &msg)

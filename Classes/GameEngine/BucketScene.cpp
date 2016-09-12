@@ -2,7 +2,7 @@
 //  BucketScene.cpp
 //  Popcorn
 //
-//  Created by Monkey on 8/8/16.
+//  Created by Hans on 8/8/16.
 //
 //
 
@@ -62,7 +62,8 @@ bool BucketScene::init()
                                              SimpleAudioEngine::getInstance()->playEffect("click.mp3");
                                              // Show reward Video.
                                              PluginChartboost::show("Rewarded Video");
-                                             UserDefault::getInstance()->setBoolForKey("DBLVide0", true);
+                                             PluginChartboost::cache("Rewarded Video");
+                                             UserDefault::getInstance()->setBoolForKey("DBLVideo", true);
                                          });
     m_btn_double->setPosition(G_SWIDTH / 2, G_SHEIGHT / 3);
     m_btn_double->setScale(G_SCALEM * 0.9, G_SCALEY * 1.2);
@@ -94,6 +95,12 @@ bool BucketScene::init()
                                                            cashmanager->setCurrentBucket(0);
                                                            cashmanager->setisBucketShown(false);
                                                            Director::getInstance()->getEventDispatcher()->resumeEventListenersForTarget(this->getParent());
+                                                           
+                                                           if (dynamic_cast<GameScene*>(this->getParent())) {
+                                                               GameScene* gamescene = (GameScene*)this->getParent();
+                                                               gamescene->setButtonEnable(true);
+                                                           }
+                                                           
                                                            this->removeFromParent();
                                                        });
     btn_collect->setScale(G_SCALEM * 0.8, G_SCALEY * 1.1);
@@ -131,23 +138,23 @@ bool BucketScene::init()
     
     
     CashManager *cashmananger = CashManager::getInstance();
-    float currentCash = cashmananger->getCurrentCash();
+    float currentBucket = cashmananger->getCurrentBucket();
     float bucketSize = cashmananger->getBucketSize();
     float perHour = cashmananger->getCashPerHour();
     
-    m_lbl_double = Label::createWithTTF(StringUtils::format("Double It? Get %s\n Kernels", cashmananger->ConvertAmountToShortString(bucketSize * 2).c_str()), "AmericanTypewriter.ttf", G_SWIDTH / 20);
+    m_lbl_double = Label::createWithTTF(StringUtils::format("Double It? Get %s\n Kernels", cashmananger->convertAmountToShortString(bucketSize * 2).c_str()), "AmericanTypewriter.ttf", G_SWIDTH / 20);
     m_lbl_double->setPosition(m_btn_double->getPositionX() - m_btn_double->getBoundingBox().size.width * 0.38, m_btn_double->getPositionY());
     m_lbl_double->setAlignment(TextHAlignment::CENTER);
     m_lbl_double->setAnchorPoint(Vec2(0.0f, 0.5f));
     this->addChild(m_lbl_double);
     
-    m_lbl_cash = Label::createWithTTF(StringUtils::format("%s\n /%s Kernels", cashmananger->ConvertAmountToShortString(currentCash).c_str(), cashmananger->ConvertAmountToShortString(currentCash).c_str()), "AmericanTypewriter.ttf", G_SWIDTH / 10);
+    m_lbl_cash = Label::createWithTTF(StringUtils::format("%s\n /%s Kernels", cashmananger->convertAmountToShortString(currentBucket).c_str(), cashmananger->convertAmountToShortString(bucketSize).c_str()), "AmericanTypewriter.ttf", G_SWIDTH / 10);
     m_lbl_cash->setColor(Color3B::BLACK);
     m_lbl_cash->setAlignment(TextHAlignment::CENTER);
     m_lbl_cash->setPosition(G_SWIDTH / 2, m_btn_double->getPositionY() + m_btn_double->getBoundingBox().size.height / 2 + m_lbl_cash->getBoundingBox().size.height);
     this->addChild(m_lbl_cash);
     
-    m_lbl_perHour = Label::createWithTTF(StringUtils::format("%s Kernels /Hour", cashmananger->ConvertAmountToShortString(perHour).c_str()), "AmericanTypewriter.ttf", G_SWIDTH / 10);
+    m_lbl_perHour = Label::createWithTTF(StringUtils::format("%s\nKernels /Hour", cashmananger->convertAmountToShortString(perHour).c_str()), "AmericanTypewriter.ttf", G_SWIDTH / 10);
     m_lbl_perHour->setPosition((G_SWIDTH - spt_hand->getBoundingBox().size.width) * 0.5, G_SHEIGHT * 0.8);
     m_lbl_perHour->setWidth((G_SWIDTH - spt_hand->getBoundingBox().size.width) * 0.8);
     m_lbl_perHour->setAlignment(TextHAlignment::CENTER);
@@ -181,14 +188,13 @@ void BucketScene::setButtonEnable(bool value)
 void BucketScene::update(float dt)
 {
     CashManager *cashmananger = CashManager::getInstance();
-    float currentCash = cashmananger->getCurrentCash();
     float currentBucket = cashmananger->getCurrentBucket();
     float bucketSize = cashmananger->getBucketSize();
     float perHour = cashmananger->getCashPerHour();
     
-    m_lbl_cash->setString(StringUtils::format("%s\n /%s Kernels", cashmananger->ConvertAmountToShortString(currentCash).c_str(), cashmananger->ConvertAmountToShortString(currentCash).c_str()));
+    m_lbl_cash->setString(StringUtils::format("%s\n /%s Kernels", cashmananger->convertAmountToShortString(currentBucket).c_str(), cashmananger->convertAmountToShortString(bucketSize).c_str()));
     
-    m_lbl_perHour->setString(StringUtils::format("%s Kernels /Hour", cashmananger->ConvertAmountToShortString(perHour).c_str()));
+    m_lbl_perHour->setString(StringUtils::format("%s\nKernels /Hour", cashmananger->convertAmountToShortString(perHour).c_str()));
     
     if (currentBucket < bucketSize * 0.25) {
         m_spt_bucket->setTexture("bucketLayer1.png");
@@ -214,7 +220,7 @@ void BucketScene::update(float dt)
             m_btn_double->setVisible(true);
             m_spt_TV->setVisible(true);
             m_lbl_double->setVisible(true);
-            m_lbl_double->setString(StringUtils::format("Double It? Get %s\n Kernels", cashmananger->ConvertAmountToShortString(bucketSize * 2).c_str()));
+            m_lbl_double->setString(StringUtils::format("Double It? Get %s\n Kernels", cashmananger->convertAmountToShortString(bucketSize * 2).c_str()));
         }
     }
 }
@@ -222,6 +228,12 @@ void BucketScene::update(float dt)
 void BucketScene::checkVideo(float dt)
 {
     if (UserDefault::getInstance()->getBoolForKey("CollectDBL")) {
+        Director::getInstance()->getEventDispatcher()->resumeEventListenersForTarget(this->getParent());
+        
+        if (dynamic_cast<GameScene*>(this->getParent())) {
+            GameScene* gamescene = (GameScene*)this->getParent();
+            gamescene->setButtonEnable(true);
+        }
         this->removeFromParent();
     }
 }

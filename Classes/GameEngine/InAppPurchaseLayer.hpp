@@ -2,7 +2,7 @@
 //  InAppPurchaseLayer.hpp
 //  Popcorn
 //
-//  Created by Monkey on 8/1/16.
+//  Created by Hans on 8/1/16.
 //
 //
 

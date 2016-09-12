@@ -2,7 +2,7 @@
 //  InAppPurchaseLayer.cpp
 //  Popcorn
 //
-//  Created by Monkey on 8/1/16.
+//  Created by Hans on 8/1/16.
 //
 //
 
@@ -40,28 +40,6 @@ bool InAppPurchaseLayer::init()
     IAP::refresh();
     
     UserDefault *userdefault = UserDefault::getInstance();
-    
-    chefhat_price = userdefault->getFloatForKey("chefhat_price");
-    upiggybank_price = userdefault->getFloatForKey("Upiggybank_price");
-    moon_price = userdefault->getFloatForKey("moon_price");
-    earth_price = userdefault->getFloatForKey("earth_price");
-    spaceship_price = userdefault->getFloatForKey("spaceship_price");
-    ufo_price = userdefault->getFloatForKey("ufo_price");
-    dinnerplate_price = userdefault->getFloatForKey("dinnerplate_price");
-    trophycup_price = userdefault->getFloatForKey("trophycup_price");
-    car_price = userdefault->getFloatForKey("car_price");
-    umbrella_price = userdefault->getFloatForKey("umbrella_price");
-    diamond_price = userdefault->getFloatForKey("diamond_price");
-    prestige_price = userdefault->getFloatForKey("prestige_price");
-    ocean_price = userdefault->getFloatForKey("ocean_price");
-    city_price = userdefault->getFloatForKey("city_price");
-    sky_price = userdefault->getFloatForKey("sky_price");
-    universe_price = userdefault->getFloatForKey("universe_price");
-    jungle_price = userdefault->getFloatForKey("jungle_price");
-    desert_price = userdefault->getFloatForKey("desert_price");
-    beach_price = userdefault->getFloatForKey("beach_price");
-    prestige_count = userdefault->getIntegerForKey("prestige_count");
-    
     
     list_iapname.push_back("Kernel Blast");
     list_iapname.push_back("Kernel Bomb");
@@ -134,7 +112,6 @@ ssize_t InAppPurchaseLayer::numberOfCellsInTableView(cocos2d::extension::TableVi
 
 TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableView *table, ssize_t idx)
 {
-    
     TableViewCell* cell = table->dequeueCell();
     cell = new TableViewCell();
     cell->autorelease();
@@ -142,6 +119,27 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
     UserDefault *userdefault = UserDefault::getInstance();
     CashManager *cashmananger =  CashManager::getInstance();
     float cash = cashmananger->getCurrentCash();
+    
+    chefhat_price = userdefault->getFloatForKey("chefhat_price");
+    upiggybank_price = userdefault->getFloatForKey("Upiggybank_price");
+    moon_price = userdefault->getFloatForKey("moon_price");
+    earth_price = userdefault->getFloatForKey("earth_price");
+    spaceship_price = userdefault->getFloatForKey("spaceship_price");
+    ufo_price = userdefault->getFloatForKey("ufo_price");
+    dinnerplate_price = userdefault->getFloatForKey("dinnerplate_price");
+    trophycup_price = userdefault->getFloatForKey("trophycup_price");
+    car_price = userdefault->getFloatForKey("car_price");
+    umbrella_price = userdefault->getFloatForKey("umbrella_price");
+    diamond_price = userdefault->getFloatForKey("diamond_price");
+    prestige_price = userdefault->getFloatForKey("prestige_price");
+    ocean_price = userdefault->getFloatForKey("ocean_price");
+    city_price = userdefault->getFloatForKey("city_price");
+    sky_price = userdefault->getFloatForKey("sky_price");
+    universe_price = userdefault->getFloatForKey("universe_price");
+    jungle_price = userdefault->getFloatForKey("jungle_price");
+    desert_price = userdefault->getFloatForKey("desert_price");
+    beach_price = userdefault->getFloatForKey("beach_price");
+    prestige_count = userdefault->getIntegerForKey("prestige_count");
     
     auto background_color = Color3B(242, 42, 73);
     auto bg = Sprite::create();
@@ -219,11 +217,12 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
             if (userdefault->getBoolForKey("Reviewed")) {
                 lbl_product->setString("Have a suggestion?");
                 lbl_price->setString("We'd love to hear");
+                lbl_desc->setString(T_EMAIL_ADDRESS);
             }else
             {
                 lbl_product->setString("Write a Review");
                 lbl_price->setString("Leave a Review for a Bonus");
-                lbl_desc->setString("+15%% Kernel Boost");
+                lbl_desc->setString("+15% Kernel Boost");
                 lbl_shaker->setVisible(true);
                 spt_shaker->setVisible(true);
             }
@@ -234,7 +233,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
             lbl_product->setString("Facebook");
             lbl_price->setString("Share");
             if (!userdefault->getBoolForKey("facebook")) {
-                lbl_desc->setString("+15%% Kernel Boost");
+                lbl_desc->setString("+15% Kernel Boost");
                 lbl_shaker->setVisible(true);
                 spt_shaker->setVisible(true);
             }
@@ -245,7 +244,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
             lbl_product->setString("Twitter");
             lbl_price->setString("Share");
             if (!userdefault->getBoolForKey("twitter")) {
-                lbl_desc->setString("+15%% Kernel Boost");
+                lbl_desc->setString("+15% Kernel Boost");
                 lbl_shaker->setVisible(true);
                 spt_shaker->setVisible(true);
             }
@@ -262,8 +261,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
             }
             lbl_price->setString(price);
             
-//            lbl_price->setString("$1.99");
-            lbl_desc->setString(StringUtils::format("Get %s Kernels Instantly", cashmananger->ConvertAmountToShortString(cash * 100).c_str()));
+            lbl_desc->setString(StringUtils::format("Get %s Kernels Instantly", cashmananger->convertAmountToShortString(cash * 100).c_str()));
             if (cash < 600) {
                 lbl_desc->setString("Get 1000 Kernels Instantly");
             }
@@ -282,8 +280,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
             }
             lbl_price->setString(price);
             
-//            lbl_price->setString("$19.99");
-            lbl_desc->setString(StringUtils::format("Get %s Kernels Instantly", cashmananger->ConvertAmountToShortString(cash * 100).c_str()));
+            lbl_desc->setString(StringUtils::format("Get %s Kernels Instantly", cashmananger->convertAmountToShortString(cash * 100).c_str()));
             if (cash < 1000) {
                 lbl_desc->setString("Get 20K Kernels Instantly");
             }
@@ -302,7 +299,6 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
             }
             lbl_price->setString(price);
             
-//            lbl_price->setString("$0.99");
             spt_shaker->setVisible(true);
             lbl_shaker->setVisible(true);
             break;
@@ -318,7 +314,6 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
             }
             lbl_price->setString(price);
 
-//            lbl_price->setString("$0.99");
             spt_shaker->setVisible(true);
             lbl_shaker->setVisible(true);
             break;
@@ -333,7 +328,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
                 }
             }
             lbl_price->setString(price);
-//            lbl_price->setString("$0.99");
+
             lbl_desc->setString("Get 20x Kernels Per Click");
             if (!userdefault->getBoolForKey("Forever20")) {
                 spt_shaker->setVisible(true);
@@ -351,8 +346,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
                 }
             }
             lbl_price->setString(price);
-            
-//            lbl_price->setString("$1.99");
+
             if (!userdefault->getBoolForKey("RemoveAds")) {
                 spt_shaker->setVisible(true);
                 lbl_shaker->setVisible(true);
@@ -370,7 +364,6 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
             }
             lbl_price->setString(price);
             
-//            lbl_price->setString("$39.99");
             lbl_desc->setString("All Investments Are Half Price");
             if (!userdefault->getBoolForKey("RemoveAds")) {
                 spt_shaker->setVisible(true);
@@ -391,7 +384,6 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
                 }
                 lbl_price->setString(price);
                 
-//                lbl_price->setString("$4.99");
                 spt_shaker->setVisible(true);
                 lbl_shaker->setVisible(true);
             }
@@ -410,7 +402,6 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
                 }
                 lbl_price->setString(price);
                 
-//                lbl_price->setString("$1.99");
                 spt_shaker->setVisible(true);
                 lbl_shaker->setVisible(true);
             }else
@@ -435,7 +426,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
         case 14:
             spt_item->setTexture("iap_hat.png");
             lbl_product->setString("Chef Hat");
-            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->ConvertAmountToShortString(chefhat_price).c_str()));
+            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->convertAmountToShortString(chefhat_price).c_str()));
             if (chefhat_price != 0) {
                 spt_shaker->setVisible(true);
                 lbl_shaker->setVisible(true);
@@ -444,7 +435,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
         case 15:
             spt_item->setTexture("iap_goldpiggy.png");
             lbl_product->setString("Piggy Bank");
-            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->ConvertAmountToShortString(upiggybank_price).c_str()));
+            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->convertAmountToShortString(upiggybank_price).c_str()));
             if (upiggybank_price != 0) {
                 spt_shaker->setVisible(true);
                 lbl_shaker->setVisible(true);
@@ -453,7 +444,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
         case 16:
             spt_item->setTexture("iap_moon.png");
             lbl_product->setString("Moon");
-            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->ConvertAmountToShortString(moon_price).c_str()));
+            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->convertAmountToShortString(moon_price).c_str()));
             if (moon_price != 0) {
                 spt_shaker->setVisible(true);
                 lbl_shaker->setVisible(true);
@@ -462,7 +453,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
         case 17:
             spt_item->setTexture("iap_earth.png");
             lbl_product->setString("Earth");
-            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->ConvertAmountToShortString(earth_price).c_str()));
+            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->convertAmountToShortString(earth_price).c_str()));
             if (earth_price != 0) {
                 spt_shaker->setVisible(true);
                 lbl_shaker->setVisible(true);
@@ -471,7 +462,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
         case 18:
             spt_item->setTexture("iap_spaceship.png");
             lbl_product->setString("Spaceship");
-            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->ConvertAmountToShortString(spaceship_price).c_str()));
+            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->convertAmountToShortString(spaceship_price).c_str()));
             if (spaceship_price != 0) {
                 spt_shaker->setVisible(true);
                 lbl_shaker->setVisible(true);
@@ -480,7 +471,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
         case 19:
             spt_item->setTexture("iap_ufo.png");
             lbl_product->setString("UFO");
-            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->ConvertAmountToShortString(ufo_price).c_str()));
+            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->convertAmountToShortString(ufo_price).c_str()));
             if (ufo_price != 0) {
                 spt_shaker->setVisible(true);
                 lbl_shaker->setVisible(true);
@@ -489,7 +480,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
         case 20:
             spt_item->setTexture("iap_tray.png");
             lbl_product->setString("Dinner Plate");
-            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->ConvertAmountToShortString(dinnerplate_price).c_str()));
+            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->convertAmountToShortString(dinnerplate_price).c_str()));
             if (dinnerplate_price != 0) {
                 spt_shaker->setVisible(true);
                 lbl_shaker->setVisible(true);
@@ -498,7 +489,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
         case 21:
             spt_item->setTexture("iap_trophy.png");
             lbl_product->setString("Trophy Cup");
-            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->ConvertAmountToShortString(trophycup_price).c_str()));
+            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->convertAmountToShortString(trophycup_price).c_str()));
             if (trophycup_price != 0) {
                 spt_shaker->setVisible(true);
                 lbl_shaker->setVisible(true);
@@ -507,7 +498,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
         case 22:
             spt_item->setTexture("iap_car.png");
             lbl_product->setString("Car");
-            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->ConvertAmountToShortString(car_price).c_str()));
+            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->convertAmountToShortString(car_price).c_str()));
             if (car_price != 0) {
                 spt_shaker->setVisible(true);
                 lbl_shaker->setVisible(true);
@@ -516,7 +507,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
         case 23:
             spt_item->setTexture("iap_umbrella.png");
             lbl_product->setString("Umbrella");
-            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->ConvertAmountToShortString(umbrella_price).c_str()));
+            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->convertAmountToShortString(umbrella_price).c_str()));
             if (umbrella_price != 0) {
                 spt_shaker->setVisible(true);
                 lbl_shaker->setVisible(true);
@@ -525,7 +516,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
         case 24:
             spt_item->setTexture("iap_diamond.png");
             lbl_product->setString("Diamond");
-            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->ConvertAmountToShortString(diamond_price).c_str()));
+            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->convertAmountToShortString(diamond_price).c_str()));
             if (diamond_price != 0) {
                 spt_shaker->setVisible(true);
                 lbl_shaker->setVisible(true);
@@ -534,7 +525,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
         case 25:
             spt_item->setTexture("iap_presteige.png");
             lbl_product->setString("Prestige");
-            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->ConvertAmountToShortString(prestige_price).c_str()));
+            lbl_price->setString(StringUtils::format("%s Kernels", cashmananger->convertAmountToShortString(prestige_price).c_str()));
 /////////////
             lbl_desc->setString("(Resets Kernels and Investments)");
             if (prestige_price != 0) {
@@ -560,7 +551,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
                 lbl_price->setString("");
             }else
             {
-                lbl_price->setString(StringUtils::format("Unlock at Prestige Level %s", cashmananger->ConvertAmountToShortString(ocean_price).c_str()));
+                lbl_price->setString(StringUtils::format("Unlock at Prestige Level %s", cashmananger->convertAmountToShortString(ocean_price).c_str()));
             }
             break;
         case 28:
@@ -572,7 +563,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
                 lbl_price->setString("");
             }else
             {
-                lbl_price->setString(StringUtils::format("Unlock at Prestige Level %s", cashmananger->ConvertAmountToShortString(city_price).c_str()));
+                lbl_price->setString(StringUtils::format("Unlock at Prestige Level %s", cashmananger->convertAmountToShortString(city_price).c_str()));
             }
             break;
         case 29:
@@ -584,7 +575,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
                 lbl_price->setString("");
             }else
             {
-                lbl_price->setString(StringUtils::format("Unlock at Prestige Level %s", cashmananger->ConvertAmountToShortString(sky_price).c_str()));
+                lbl_price->setString(StringUtils::format("Unlock at Prestige Level %s", cashmananger->convertAmountToShortString(sky_price).c_str()));
             }
             break;
         case 30:
@@ -596,7 +587,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
                 lbl_price->setString("");
             }else
             {
-                lbl_price->setString(StringUtils::format("Unlock at Prestige Level %s", cashmananger->ConvertAmountToShortString(universe_price).c_str()));
+                lbl_price->setString(StringUtils::format("Unlock at Prestige Level %s", cashmananger->convertAmountToShortString(universe_price).c_str()));
             }
             break;
         case 31:
@@ -608,7 +599,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
                 lbl_price->setString("");
             }else
             {
-                lbl_price->setString(StringUtils::format("Unlock at Prestige Level %s", cashmananger->ConvertAmountToShortString(jungle_price).c_str()));
+                lbl_price->setString(StringUtils::format("Unlock at Prestige Level %s", cashmananger->convertAmountToShortString(jungle_price).c_str()));
             }
             break;
         case 32:
@@ -620,7 +611,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
                 lbl_price->setString("");
             }else
             {
-                lbl_price->setString(StringUtils::format("Unlock at Prestige Level %s", cashmananger->ConvertAmountToShortString(desert_price).c_str()));
+                lbl_price->setString(StringUtils::format("Unlock at Prestige Level %s", cashmananger->convertAmountToShortString(desert_price).c_str()));
             }
             break;
         case 33:
@@ -632,7 +623,7 @@ TableViewCell* InAppPurchaseLayer::tableCellAtIndex(cocos2d::extension::TableVie
                 lbl_price->setString("");
             }else
             {
-                lbl_price->setString(StringUtils::format("Unlock at Prestige Level %s", cashmananger->ConvertAmountToShortString(beach_price).c_str()));
+                lbl_price->setString(StringUtils::format("Unlock at Prestige Level %s", cashmananger->convertAmountToShortString(beach_price).c_str()));
             }
             break;
         default:
@@ -663,7 +654,9 @@ void InAppPurchaseLayer::tableCellTouched(cocos2d::extension::TableView *table, 
     JniMethodInfo t;
 #endif
 
-    string shareString = StringUtils::format("I've popped %s kernels in Kernel King. Bet you can't pop more! Try to beat me: http://apple.co/1Th8VFr #KernelKing", cashmanager->ConvertAmountToShortString(currentCash).c_str());
+    string shareString = StringUtils::format("I've popped %s kernels in Kernel King. Bet you can't pop more! Try to beat me: http://apple.co/1Th8VFr #KernelKing", cashmanager->convertAmountToShortString(currentCash).c_str());
+    
+    sdkbox::Product p;
     
     switch (index) {
         case 0:
@@ -685,7 +678,7 @@ void InAppPurchaseLayer::tableCellTouched(cocos2d::extension::TableView *table, 
             {
                 // Open Itunes
                 cashmanager->setCurrentShaker(currentShaker + 1);
-                cashmanager->setCurrentCash(currentCash * 0.15);
+                cashmanager->setCurrentCash(currentCash * 0.15 + currentCash);
                 userdefault->setBoolForKey("Reviewed", true);
 #if CC_TARGET_PLATFORM == CC_PLATFORM_IOS
                 
@@ -1381,7 +1374,6 @@ void InAppPurchaseLayer::tableCellTouched(cocos2d::extension::TableView *table, 
                 userdefault->setFloatForKey("13_price",         userdefault->getFloatForKey("13_price") / 2);
                 userdefault->setFloatForKey("14_price",         userdefault->getFloatForKey("14_price") / 2);
                 userdefault->setFloatForKey("15_price",         userdefault->getFloatForKey("15_price") / 2);
-                
             }
             break;
         case 26:
@@ -1453,8 +1445,11 @@ void InAppPurchaseLayer::tableCellTouched(cocos2d::extension::TableView *table, 
             break;
     }
 //
-//    cashmanager->reloadCashPerSecondAndCashPerSwap();
-////    table->reloadData();
+    cashmanager->reloadCashPerSecondAndCashPerSwap();
+    
+    Vec2 offset = table->getContentOffset();
+    table->reloadData();
+    table->setContentOffset(offset);
 }
 
 void InAppPurchaseLayer::onInitialized(bool ok)
@@ -1510,8 +1505,72 @@ void InAppPurchaseLayer::onSuccess(sdkbox::Product const& p)
     }else if (p.name == "Kernel Sale")
     {
         cashmanager->setCurrentShaker(currentShaker + 1);
+        if (!userdefault->getBoolForKey("KernelSale", false)) {
+            userdefault->setFloatForKey("piggybank_price",      userdefault->getFloatForKey("piggybank_price") / 2);
+            userdefault->setFloatForKey("mattress_price",       userdefault->getFloatForKey("mattress_price") / 2);
+            userdefault->setFloatForKey("comicbook_price",      userdefault->getFloatForKey("comicbook_price") / 2);
+            userdefault->setFloatForKey("savingaccount_price",  userdefault->getFloatForKey("savingaccount_price") / 2);
+            userdefault->setFloatForKey("bitcoinaccount_price", userdefault->getFloatForKey("bitcoinaccount_price") / 2);
+            userdefault->setFloatForKey("stockes_price",        userdefault->getFloatForKey("stockes_price") / 2);
+            userdefault->setFloatForKey("bookie_price",         userdefault->getFloatForKey("bookie_price") / 2);
+            userdefault->setFloatForKey("loanshark_price",      userdefault->getFloatForKey("loanshark_price") / 2);
+            userdefault->setFloatForKey("angelinvestment_price", userdefault->getFloatForKey("angelinvestment_price") / 2);
+            userdefault->setFloatForKey("vanturecapital_price", userdefault->getFloatForKey("vanturecapital_price") / 2);
+            userdefault->setFloatForKey("porkbelly_price",      userdefault->getFloatForKey("porkbelly_price") / 2);
+            userdefault->setFloatForKey("hedgefund_price",      userdefault->getFloatForKey("hedgefund_price") / 2);
+            userdefault->setFloatForKey("investmentbank_price", userdefault->getFloatForKey("investmentbank_price") / 2);
+            userdefault->setFloatForKey("insidertrading_price", userdefault->getFloatForKey("insidertrading_price") / 2);
+            userdefault->setFloatForKey("mortgage_price",       userdefault->getFloatForKey("mortgage_price") / 2);
+            userdefault->setFloatForKey("pyramid_price",        userdefault->getFloatForKey("pyramid_price") / 2);
+            userdefault->setFloatForKey("hypercube_price",      userdefault->getFloatForKey("hypercube_price") / 2);
+            userdefault->setFloatForKey("unholy_price",         userdefault->getFloatForKey("unholy_price") / 2);
+            userdefault->setFloatForKey("honey_price",          userdefault->getFloatForKey("honey_price") / 2);
+            
+            userdefault->setFloatForKey("paperroute_price",     userdefault->getFloatForKey("paperroute_price") / 2);
+            userdefault->setFloatForKey("lemon_price",          userdefault->getFloatForKey("lemon_price") / 2);
+            userdefault->setFloatForKey("flower_price",         userdefault->getFloatForKey("flower_price") / 2);
+            userdefault->setFloatForKey("coffee_price",         userdefault->getFloatForKey("coffee_price") / 2);
+            userdefault->setFloatForKey("fastfood_price",       userdefault->getFloatForKey("fastfood_price") / 2);
+            userdefault->setFloatForKey("casino_price",         userdefault->getFloatForKey("casino_price") / 2);
+            userdefault->setFloatForKey("cigrate_price",        userdefault->getFloatForKey("cigrate_price") / 2);
+            userdefault->setFloatForKey("soda_price",           userdefault->getFloatForKey("soda_price") / 2);
+            userdefault->setFloatForKey("railroad_price",       userdefault->getFloatForKey("railroad_price") / 2);
+            userdefault->setFloatForKey("strip_price",          userdefault->getFloatForKey("strip_price") / 2);
+            userdefault->setFloatForKey("arctic_price",         userdefault->getFloatForKey("arctic_price") / 2);
+            userdefault->setFloatForKey("candytheft_price",     userdefault->getFloatForKey("candytheft_price") / 2);
+            userdefault->setFloatForKey("oldlady_price",        userdefault->getFloatForKey("oldlady_price") / 2);
+            userdefault->setFloatForKey("clown_price",          userdefault->getFloatForKey("clown_price") / 2);
+            userdefault->setFloatForKey("nsa_price",            userdefault->getFloatForKey("nsa_price") / 2);
+            userdefault->setFloatForKey("dog_price",            userdefault->getFloatForKey("dog_price") / 2);
+            userdefault->setFloatForKey("cat_price",            userdefault->getFloatForKey("cat_price") / 2);
+            userdefault->setFloatForKey("cryogenic_price",      userdefault->getFloatForKey("cryogenic_price") / 2);
+            userdefault->setFloatForKey("banana_price",         userdefault->getFloatForKey("banana_price") / 2);
+            
+            userdefault->setFloatForKey("0_price",          userdefault->getFloatForKey("0_price") / 2);
+            userdefault->setFloatForKey("1_price",          userdefault->getFloatForKey("1_price") / 2);
+            userdefault->setFloatForKey("2_price",          userdefault->getFloatForKey("2_price") / 2);
+            userdefault->setFloatForKey("3_price",          userdefault->getFloatForKey("3_price") / 2);
+            userdefault->setFloatForKey("4_price",          userdefault->getFloatForKey("4_price") / 2);
+            userdefault->setFloatForKey("5_price",          userdefault->getFloatForKey("5_price") / 2);
+            userdefault->setFloatForKey("6_price",          userdefault->getFloatForKey("6_price") / 2);
+            userdefault->setFloatForKey("7_price",          userdefault->getFloatForKey("7_price") / 2);
+            userdefault->setFloatForKey("8_price",          userdefault->getFloatForKey("8_price") / 2);
+            userdefault->setFloatForKey("9_price",          userdefault->getFloatForKey("9_price") / 2);
+            userdefault->setFloatForKey("10_price",         userdefault->getFloatForKey("10_price") / 2);
+            userdefault->setFloatForKey("11_price",         userdefault->getFloatForKey("11_price") / 2);
+            userdefault->setFloatForKey("12_price",         userdefault->getFloatForKey("12_price") / 2);
+            userdefault->setFloatForKey("13_price",         userdefault->getFloatForKey("13_price") / 2);
+            userdefault->setFloatForKey("14_price",         userdefault->getFloatForKey("14_price") / 2);
+            userdefault->setFloatForKey("15_price",         userdefault->getFloatForKey("15_price") / 2);
+        }
+        userdefault->setBoolForKey("KernelSale", true);
+        
     }else if (p.name == "King Kernel")
     {
+        if (!userdefault->getBoolForKey("KingKernelPurchased")) {
+            cashmanager->setCurrentShaker(currentShaker + 1);
+            userdefault->setBoolForKey("KingKernelPurchased", true);
+        }
         userdefault->setBoolForKey("classicbox", false);
         userdefault->setBoolForKey("chefhat", false);
         userdefault->setBoolForKey("Upiggbank", false);
@@ -1536,6 +1595,10 @@ void InAppPurchaseLayer::onSuccess(sdkbox::Product const& p)
             cashmanager->setCurrentShaker(currentShaker + 1);
         }
     }
+    
+    Vec2 offset = m_tableview->getContentOffset();
+    m_tableview->reloadData();
+    m_tableview->setContentOffset(offset);
 }
 
 void InAppPurchaseLayer::onFailure(sdkbox::Product const& p, const std::string &msg)
@@ -1551,6 +1614,113 @@ void InAppPurchaseLayer::onCanceled(sdkbox::Product const& p)
 void InAppPurchaseLayer::onRestored(sdkbox::Product const& p)
 {
     log("IAP >>> Purchase Restored: %s", p.name.c_str());
+    UserDefault *userdefault = UserDefault::getInstance();
+    CashManager *cashmanager = CashManager::getInstance();
+    float currentShaker = cashmanager->getCurrentShaker();    
+    
+    if (p.name == "Forever 20x") {
+        userdefault->setBoolForKey("Forever20", true);
+        cashmanager->setCurrentShaker(currentShaker + 1);
+    }else if (p.name == "Kernel Sale")
+    {
+        cashmanager->setCurrentShaker(currentShaker + 1);
+        if (!userdefault->getBoolForKey("KernelSale", false)) {
+            userdefault->setFloatForKey("piggybank_price",      userdefault->getFloatForKey("piggybank_price") / 2);
+            userdefault->setFloatForKey("mattress_price",       userdefault->getFloatForKey("mattress_price") / 2);
+            userdefault->setFloatForKey("comicbook_price",      userdefault->getFloatForKey("comicbook_price") / 2);
+            userdefault->setFloatForKey("savingaccount_price",  userdefault->getFloatForKey("savingaccount_price") / 2);
+            userdefault->setFloatForKey("bitcoinaccount_price", userdefault->getFloatForKey("bitcoinaccount_price") / 2);
+            userdefault->setFloatForKey("stockes_price",        userdefault->getFloatForKey("stockes_price") / 2);
+            userdefault->setFloatForKey("bookie_price",         userdefault->getFloatForKey("bookie_price") / 2);
+            userdefault->setFloatForKey("loanshark_price",      userdefault->getFloatForKey("loanshark_price") / 2);
+            userdefault->setFloatForKey("angelinvestment_price", userdefault->getFloatForKey("angelinvestment_price") / 2);
+            userdefault->setFloatForKey("vanturecapital_price", userdefault->getFloatForKey("vanturecapital_price") / 2);
+            userdefault->setFloatForKey("porkbelly_price",      userdefault->getFloatForKey("porkbelly_price") / 2);
+            userdefault->setFloatForKey("hedgefund_price",      userdefault->getFloatForKey("hedgefund_price") / 2);
+            userdefault->setFloatForKey("investmentbank_price", userdefault->getFloatForKey("investmentbank_price") / 2);
+            userdefault->setFloatForKey("insidertrading_price", userdefault->getFloatForKey("insidertrading_price") / 2);
+            userdefault->setFloatForKey("mortgage_price",       userdefault->getFloatForKey("mortgage_price") / 2);
+            userdefault->setFloatForKey("pyramid_price",        userdefault->getFloatForKey("pyramid_price") / 2);
+            userdefault->setFloatForKey("hypercube_price",      userdefault->getFloatForKey("hypercube_price") / 2);
+            userdefault->setFloatForKey("unholy_price",         userdefault->getFloatForKey("unholy_price") / 2);
+            userdefault->setFloatForKey("honey_price",          userdefault->getFloatForKey("honey_price") / 2);
+            
+            userdefault->setFloatForKey("paperroute_price",     userdefault->getFloatForKey("paperroute_price") / 2);
+            userdefault->setFloatForKey("lemon_price",          userdefault->getFloatForKey("lemon_price") / 2);
+            userdefault->setFloatForKey("flower_price",         userdefault->getFloatForKey("flower_price") / 2);
+            userdefault->setFloatForKey("coffee_price",         userdefault->getFloatForKey("coffee_price") / 2);
+            userdefault->setFloatForKey("fastfood_price",       userdefault->getFloatForKey("fastfood_price") / 2);
+            userdefault->setFloatForKey("casino_price",         userdefault->getFloatForKey("casino_price") / 2);
+            userdefault->setFloatForKey("cigrate_price",        userdefault->getFloatForKey("cigrate_price") / 2);
+            userdefault->setFloatForKey("soda_price",           userdefault->getFloatForKey("soda_price") / 2);
+            userdefault->setFloatForKey("railroad_price",       userdefault->getFloatForKey("railroad_price") / 2);
+            userdefault->setFloatForKey("strip_price",          userdefault->getFloatForKey("strip_price") / 2);
+            userdefault->setFloatForKey("arctic_price",         userdefault->getFloatForKey("arctic_price") / 2);
+            userdefault->setFloatForKey("candytheft_price",     userdefault->getFloatForKey("candytheft_price") / 2);
+            userdefault->setFloatForKey("oldlady_price",        userdefault->getFloatForKey("oldlady_price") / 2);
+            userdefault->setFloatForKey("clown_price",          userdefault->getFloatForKey("clown_price") / 2);
+            userdefault->setFloatForKey("nsa_price",            userdefault->getFloatForKey("nsa_price") / 2);
+            userdefault->setFloatForKey("dog_price",            userdefault->getFloatForKey("dog_price") / 2);
+            userdefault->setFloatForKey("cat_price",            userdefault->getFloatForKey("cat_price") / 2);
+            userdefault->setFloatForKey("cryogenic_price",      userdefault->getFloatForKey("cryogenic_price") / 2);
+            userdefault->setFloatForKey("banana_price",         userdefault->getFloatForKey("banana_price") / 2);
+            
+            userdefault->setFloatForKey("0_price",          userdefault->getFloatForKey("0_price") / 2);
+            userdefault->setFloatForKey("1_price",          userdefault->getFloatForKey("1_price") / 2);
+            userdefault->setFloatForKey("2_price",          userdefault->getFloatForKey("2_price") / 2);
+            userdefault->setFloatForKey("3_price",          userdefault->getFloatForKey("3_price") / 2);
+            userdefault->setFloatForKey("4_price",          userdefault->getFloatForKey("4_price") / 2);
+            userdefault->setFloatForKey("5_price",          userdefault->getFloatForKey("5_price") / 2);
+            userdefault->setFloatForKey("6_price",          userdefault->getFloatForKey("6_price") / 2);
+            userdefault->setFloatForKey("7_price",          userdefault->getFloatForKey("7_price") / 2);
+            userdefault->setFloatForKey("8_price",          userdefault->getFloatForKey("8_price") / 2);
+            userdefault->setFloatForKey("9_price",          userdefault->getFloatForKey("9_price") / 2);
+            userdefault->setFloatForKey("10_price",         userdefault->getFloatForKey("10_price") / 2);
+            userdefault->setFloatForKey("11_price",         userdefault->getFloatForKey("11_price") / 2);
+            userdefault->setFloatForKey("12_price",         userdefault->getFloatForKey("12_price") / 2);
+            userdefault->setFloatForKey("13_price",         userdefault->getFloatForKey("13_price") / 2);
+            userdefault->setFloatForKey("14_price",         userdefault->getFloatForKey("14_price") / 2);
+            userdefault->setFloatForKey("15_price",         userdefault->getFloatForKey("15_price") / 2);
+        }
+        userdefault->setBoolForKey("KernelSale", true);
+    }else if (p.name == "King Kernel")
+    {
+        if (!userdefault->getBoolForKey("KingKernelPurchased")) {
+            cashmanager->setCurrentShaker(currentShaker + 1);
+        }else
+        {
+            userdefault->setBoolForKey("classicbox", false);
+            userdefault->setBoolForKey("chefhat", false);
+            userdefault->setBoolForKey("Upiggbank", false);
+            userdefault->setBoolForKey("moon", false);
+            userdefault->setBoolForKey("earth", false);
+            userdefault->setBoolForKey("spaceship", false);
+            userdefault->setBoolForKey("ufo", false);
+            userdefault->setBoolForKey("dinnerplate", false);
+            userdefault->setBoolForKey("trophycup", false);
+            userdefault->setBoolForKey("car", false);
+            userdefault->setBoolForKey("umbrella", false);
+            userdefault->setBoolForKey("diamond", false);
+            userdefault->setBoolForKey("prestige", false);
+            userdefault->setBoolForKey("KingKernel", true);
+        }
+    }else if (p.name == "Remove Ads")
+    {
+        userdefault->setBoolForKey("RemoveAds", true);
+        cashmanager->setCurrentShaker(currentShaker + 1);
+    }else if (p.name == "Treadmill")
+    {
+        if (!userdefault->getBoolForKey("TreadmillPurchased")) {
+            userdefault->setBoolForKey("NewCustomBG", true);
+            userdefault->setBoolForKey("Treadmill", true);
+            userdefault->setBoolForKey("TreadmillPurchased", true);
+            cashmanager->setCurrentShaker(currentShaker + 1);
+        }
+    }
+    
+    Vec2 offset = m_tableview->getContentOffset();
+    m_tableview->reloadData();
+    m_tableview->setContentOffset(offset);
 }
 
 void InAppPurchaseLayer::onProductRequestSuccess(std::vector<sdkbox::Product> const &products)

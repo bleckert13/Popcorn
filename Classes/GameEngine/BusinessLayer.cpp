@@ -2,7 +2,7 @@
 //  BusinessLayer.cpp
 //  Popcorn
 //
-//  Created by Monkey on 7/30/16.
+//  Created by Hans on 7/30/16.
 //
 //
 
@@ -65,7 +65,7 @@ bool BusinessLayer::init()
     list_countkey.push_back("railroad_count");
     list_countkey.push_back("strip_count");
     list_countkey.push_back("arctic_count");
-    list_countkey.push_back("candytheft_price");
+    list_countkey.push_back("candytheft_count");
     list_countkey.push_back("oldlady_count");
     list_countkey.push_back("clown_count");
     list_countkey.push_back("nsa_count");
@@ -85,7 +85,7 @@ bool BusinessLayer::init()
     list_pricekey.push_back("railroad_price");
     list_pricekey.push_back("strip_price");
     list_pricekey.push_back("arctic_price");
-    list_pricekey.push_back("candytheft_count");
+    list_pricekey.push_back("candytheft_price");
     list_pricekey.push_back("oldlady_price");
     list_pricekey.push_back("clown_price");
     list_pricekey.push_back("nsa_price");
@@ -317,7 +317,7 @@ TableViewCell* BusinessLayer::tableCellAtIndex(cocos2d::extension::TableView *ta
     lbl_count->setAnchorPoint(Vec2(0, 0.5));
     cell->addChild(lbl_count);
     
-    Label *lbl_price = Label::createWithTTF(StringUtils::format("%s Kernels", CashManager::getInstance()->ConvertAmountToShortString(price).c_str()),
+    Label *lbl_price = Label::createWithTTF(StringUtils::format("%s Kernels", CashManager::getInstance()->convertAmountToShortString(price).c_str()),
                                             "AmericanTypewriter.ttf",
                                             G_SWIDTH / 25);
     lbl_price->setWidth(spt_ribb_l->getBoundingBox().size.width * 0.8);
@@ -398,6 +398,9 @@ void BusinessLayer::tableCellTouched(cocos2d::extension::TableView *table, cocos
     }
     
     cashmanager->reloadCashPerSecondAndCashPerSwap();
+    
+    Vec2 offset = table->getContentOffset();
     table->reloadData();
+    table->setContentOffset(offset);
     
 }

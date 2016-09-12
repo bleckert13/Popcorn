@@ -2,7 +2,7 @@
 //  Constants.h
 //  Popcorn
 //
-//  Created by Monkey on 7/23/16.
+//  Created by Hans on 7/23/16.
 //
 //
 
@@ -32,5 +32,5 @@
 #define T_REVIEW_RATE   "Rate Kernel King & Earn a Bonus"
 
 #define T_VIDEO_TITLE   "Watch Video"
-
+#define T_EMAIL_ADDRESS "kernelkingapp@gmail.com"
 #endif /* Constants_h */
